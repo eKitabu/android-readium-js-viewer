@@ -14,7 +14,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             console.error(err);
             console.log(path);
         }
-        
+
         if (pathUri && pathUri.is("absolute")) return path; // "http://", "https://", "data:", etc.
 
         if (path.indexOf("epub_content/") == 0) {
@@ -51,41 +51,74 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
         // },
 
         retrieveAvailableEpubs : function(success, error){
+          if (this.libraryData) {
+              success(this.libraryData);
+              return;
+          }
+
+          var self = this;
+
+          resolveLocalFileSystemURL("file:///sdcard/eKitabu/", function(dir) {
+            var reader = dir.createReader();
+            reader.readEntries(function(entries) {
+              var epubs = _.chain(entries)
+              .filter(function(entry) {
+                return entry.name.endsWith(".epub");
+              })
+              .map(function(entry) {
+                return {
+                  title: "EPUB",
+                  author: "A. Guy",
+                  rootUrl: entry.nativeURL
+                };
+              })
+              .value();
+
+              self.libraryData = epubs;
+              success(epubs);
+            }, function(error) {
+              console.error(error);
+            });
+          }, function(error) {
+            console.error(error);
+          });
+          return;
+
             if (this.libraryData){
                 success(this.libraryData);
                 return;
             }
 
             var self = this;
-        
+
             var indexUrl = moduleConfig.epubLibraryPath
                         ? StorageManager.getPathUrl(moduleConfig.epubLibraryPath)
                         : StorageManager.getPathUrl('/epub_library.json');
 
             var dataFail = function() {
                 console.error("Ebook library fail: " + indexUrl);
-                
+
                 self.libraryData = [];
                 success([]);
             };
-            
+
             var dataSuccess = function(data) {
                 console.log("Ebook library success: " + indexUrl);
-                
+
                 if (moduleConfig.epubLibraryPath) {
                     for (var i = 0; i < data.length; i++) {
                         data[i].coverHref = adjustEpubLibraryPath(data[i].coverHref);
                         data[i].rootUrl = adjustEpubLibraryPath(data[i].rootUrl);
                     }
                 }
-                
+
                 self.libraryData = data;
                 success(data);
             };
 
             if (/\.json$/.test(indexUrl)) {
-                
-                $.getJSON(indexUrl, function(data){
+
+                $.getJSON(moduleConfig.epubLibraryPath, function(data){
                     dataSuccess(data);
                 }).fail(function(){
                     dataFail();
@@ -105,7 +138,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             var self = this;
 
             $.get(packageUrl, function(data){
-    
+
                 if(typeof(data) === "string" ) {
                     var parser = new window.DOMParser;
                     data = parser.parseFromString(data, 'text/xml');
@@ -116,7 +149,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
                 jsonObj.rootDir = rootDir;
                 jsonObj.rootUrl = rootUrl;
                 jsonObj.noCoverBackground = noCoverBackground;
-    
+
                 success(jsonObj);
 
             }).fail(error);
