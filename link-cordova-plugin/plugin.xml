@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+        id="link" version="0.2.3">
+    <name>Link Cordova Plugin</name>
+    <description>Cordova plugin for fetching entries from a zip file, decrypting files and generating sha hash.</description>
+    <license>Apache 2.0</license>
+    <keywords>cordova,link</keywords>
+    <js-module src="www/link.js" name="link">
+        <clobbers target="link" />
+    </js-module>
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Link">
+                <param name="ios-package" value="LinkCordovaPlugin"/>
+            </feature>
+        </config-file>
+        <config-file target="*Info.plist" parent="UIBackgroundModes">
+            <array>
+                <string>audio</string>
+            </array>
+        </config-file>
+        <config-file target="*Info.plist" parent="ITSAppUsesNonExemptEncryption">
+            <string>NO</string>
+        </config-file>
+
+        <header-file src="src/ios/LinkCordovaPlugin.h" />
+        <source-file src="src/ios/LinkCordovaPlugin.m" />
+
+        <framework src="libz.dylib" />
+        <framework src="src/ios/libzip_iOS.framework" custom="true" />
+    </platform>
+    <platform name="android">
+        <config-file target="res/xml/config.xml" parent="/*">
+            <feature name="Link">
+                <param name="android-package" value="org.apache.cordova.plugin.LinkCordovaPlugin" />
+            </feature>
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/*">
+            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
+        </config-file>
+        <config-file target="AndroidManifest.xml" parent="/manifest/application">
+            <activity android:name="org.apache.cordova.plugin.AdvFileChooser"
+                android:label="@string/app_name">
+            </activity>
+        </config-file>
+
+        <source-file src="src/android/LinkCordovaPlugin.java" target-dir="src/org/apache/cordova/plugin" />
+
+        <source-file src="src/android/libs/armeabi-v7a/libzip.so" target-dir="libs/armeabi-v7a" />
+        <source-file src="src/android/libs/x86/libzip.so" target-dir="libs/x86" />
+
+        <source-file src="src/android/FileArrayAdapter.java" target-dir="src/org/apache/cordova/plugin" />
+        <source-file src="src/android/AdvFileChooser.java" target-dir="src/org/apache/cordova/plugin" />
+        <source-file src="src/android/Option.java" target-dir="src/org/apache/cordova/plugin" />
+
+        <resource-file src="src/android/res/drawable" target="res/drawable" />
+        <resource-file src="src/android/res/drawable/jpg32.png" target="res/drawable/jpg32.png" />
+        <resource-file src="src/android/res/drawable/zip32.png" target="res/drawable/zip32.png" />
+        <resource-file src="src/android/res/drawable/gif32.png" target="res/drawable/gif32.png" />
+        <resource-file src="src/android/res/drawable/xls.png" target="res/drawable/xls.png" />
+        <resource-file src="src/android/res/drawable/doc.png" target="res/drawable/doc.png" />
+        <resource-file src="src/android/res/drawable/back32.png" target="res/drawable/back32.png" />
+        <resource-file src="src/android/res/drawable/folder.png" target="res/drawable/folder.png" />
+        <resource-file src="src/android/res/drawable/pdf.png" target="res/drawable/pdf.png" />
+        <resource-file src="src/android/res/drawable/folder_icon.png" target="res/drawable/folder_icon.png" />
+        <resource-file src="src/android/res/drawable/whitepage32.png" target="res/drawable/whitepage32.png" />
+        <resource-file src="src/android/res/drawable/rtf32.png" target="res/drawable/rtf32.png" />
+        <resource-file src="src/android/res/drawable/ppt.png" target="res/drawable/ppt.png" />
+        <resource-file src="src/android/res/drawable/txt32.png" target="res/drawable/txt32.png" />
+        <resource-file src="src/android/res/drawable/android32.png" target="res/drawable/android32.png" />
+        <resource-file src="src/android/res/drawable/png32.png" target="res/drawable/png32.png" />
+        <resource-file src="src/android/res/values" target="res/values" />
+        <resource-file src="src/android/res/values/files.xml" target="res/values/files.xml" />
+        <resource-file src="src/android/res/layout" target="res/layout" />
+        <resource-file src="src/android/res/layout/list_view.xml" target="res/layout/list_view.xml" />
+        <resource-file src="src/android/res/layout/file_view.xml" target="res/layout/file_view.xml" />
+
+    </platform>
+</plugin>

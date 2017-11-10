@@ -27,9 +27,9 @@
         
     <icon src="www/icons/large.png"/><icon src="www/icons/small.png" width="16"/><icon src="www/icons/medium.png" width="48"/><icon src="www/icons/large.png" width="128"/></platform>
     <preference name="android-minSdkVersion" value="14"/>
-    
-    
     <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect"/>
     <preference name="xwalkMode" value="embedded"/>
     <preference name="xwalkMultipleApk" value="true"/>
+    
+    <plugin name="link" spec="../../link-cordova-plugin"/>
 <access origin="https://www.google-analytics.com/*"/></widget>

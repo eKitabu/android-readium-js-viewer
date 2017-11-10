@@ -1,0 +1,12 @@
+{
+  "program": {
+    "portable": {
+      "pnacl-translate": {
+        "url": "unzipper.pexe"
+      },
+      "pnacl-debug": {
+        "url": "unzipper.debug.pexe"
+      }
+    }
+  }
+}
