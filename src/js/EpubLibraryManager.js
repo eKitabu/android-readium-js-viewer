@@ -58,18 +58,20 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
 
           var self = this;
 
-          resolveLocalFileSystemURL("file:///sdcard/eKitabu/", function(dir) {
+          resolveLocalFileSystemURL('file:///sdcard/eKitabu/', function(dir) {
             var reader = dir.createReader();
             reader.readEntries(function(entries) {
               var epubs = _.chain(entries)
               .filter(function(entry) {
-                return entry.name.endsWith(".epub");
+                return entry.name.endsWith('.epub');
               })
               .map(function(entry) {
+                // TODO: Return actual data -- etsakov@2017.11.13
                 return {
-                  title: "EPUB",
-                  author: "A. Guy",
-                  rootUrl: entry.nativeURL
+                  title: entry.name,
+                  author: 'A. Guy',
+                  rootUrl: 'file://' + entry.fullPath
+                  // nativeURL encodes whitespaces -- etsakov@2017.11.13
                 };
               })
               .value();
