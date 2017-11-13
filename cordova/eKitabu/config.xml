@@ -1,8 +1,8 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.your.company.HelloWorld" version="2.28.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
-    <name>Readium (Development Build)</name>
-    <description>EPUB reader for Chrome</description>
-    <author email="dev@cordova.apache.org" href="http://cordova.io">Author Name &lt;a@b.com></author>
+<widget id="com.ekitabu.mobile" version="2.28.0.1" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+    <name>eKitabu</name>
+    <description>EPUB reader for Android</description>
+    <author email="support@ekitabu.com" href="http://www.ekitabu.com">eKitabu, LLC</author>
     <content src="plugins/cordova-plugin-chrome-apps-bootstrap/chromeapp.html"/>
     <plugin name="cordova-plugin-whitelist" spec="1"/>
     <allow-intent href="http://*/*"/>
@@ -13,23 +13,23 @@
     <allow-intent href="geo:*"/>
     <platform name="android">
         <allow-intent href="market:*"/>
-        
-        
-        
-        
+
+
+
+
     <icon src="www/icons/large.png"/><icon src="www/icons/small.png" width="16"/><icon src="www/icons/medium.png" width="48"/><icon src="www/icons/large.png" width="128"/></platform>
     <platform name="ios">
         <allow-intent href="itms:*"/>
         <allow-intent href="itms-apps:*"/>
-        
-        
-        
-        
+
+
+
+
     <icon src="www/icons/large.png"/><icon src="www/icons/small.png" width="16"/><icon src="www/icons/medium.png" width="48"/><icon src="www/icons/large.png" width="128"/></platform>
     <preference name="android-minSdkVersion" value="14"/>
     <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect"/>
     <preference name="xwalkMode" value="embedded"/>
     <preference name="xwalkMultipleApk" value="true"/>
-    
+
     <plugin name="link" spec="../../link-cordova-plugin"/>
 <access origin="https://www.google-analytics.com/*"/></widget>
