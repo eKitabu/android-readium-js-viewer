@@ -43,16 +43,18 @@ require.config({
         'readium_js_viewer/ModuleConfig' : {
 
             'mathJaxUrl': self.location.origin + '/scripts/mathjax/MathJax.js',
-            
+
             'fonts': fontsArray,
 
             'annotationCSSUrl': self.location.origin + '/css/annotations.css',
 
             'jsLibRoot': '/scripts/zip/',
 
-            'useSimpleLoader' : true,
+            // TODO: The more complex ZIP loader is required for the
+            // Cordova application -- etsakov@2017.11.10
+            'useSimpleLoader' : false,
 
-            'epubLibraryPath': undefined, // defaults to /epub_content/epub_library.json inside Chrome's filesystem storage
+            'epubLibraryPath': '/sdcard/eKitabu/epub_library.json',
 
             'imagePathPrefix': undefined,
 
