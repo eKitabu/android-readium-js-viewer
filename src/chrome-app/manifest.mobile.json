@@ -1,0 +1,10 @@
+{
+  "packageId": "com.ekitabu.mobile",
+  "name": "eKitabu",
+  "author": "eKitabu, LLC",
+  "description": "EPUB reader for Android",
+  "android": {
+  },
+  "ios": {
+  }
+}
