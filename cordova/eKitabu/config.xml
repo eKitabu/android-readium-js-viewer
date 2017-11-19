@@ -33,4 +33,5 @@
 
     <plugin name="link" spec="../../link-cordova-plugin"/>
     <plugin name="cordova-plugin-device" spec="1.1.7"/>
+    <plugin name="cordova-plugin-android-permissions" spec="~1.0.0"/>
 <access origin="https://www.google-analytics.com/*"/></widget>

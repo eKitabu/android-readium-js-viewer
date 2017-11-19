@@ -50,6 +50,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
         //     this.libraryData = undefined;
         // },
 
+        // TODO: Refactor this callback abomination using promises. -- etsakov@2017.11.19
         retrieveAvailableEpubs : function(success, error){
           if (this.libraryData) {
               success(this.libraryData);
@@ -57,33 +58,44 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
           }
 
           var self = this;
+          var libraryPath = 'file:///sdcard/eKitabu/';
 
-          resolveLocalFileSystemURL('file:///sdcard/eKitabu/', function(dir) {
-            var reader = dir.createReader();
-            reader.readEntries(function(entries) {
-              var epubs = _.chain(entries)
-              .filter(function(entry) {
-                return entry.name.endsWith('.epub');
-              })
-              .map(function(entry) {
-                // TODO: Return actual data -- etsakov@2017.11.13
-                return {
-                  title: entry.name,
-                  author: 'A. Guy',
-                  rootUrl: 'file://' + entry.fullPath
-                  // nativeURL encodes whitespaces -- etsakov@2017.11.13
-                };
-              })
-              .value();
+          function logError(err) {
+            console.error(err);
+            error(err);
+          }
 
-              self.libraryData = epubs;
-              success(epubs);
-            }, function(error) {
-              console.error(error);
-            });
-          }, function(error) {
-            console.error(error);
-          });
+          cordova.plugins.permissions.requestPermission(
+            cordova.plugins.permissions.READ_EXTERNAL_STORAGE,
+            function (status) {
+              if (!status.hasPermission) {
+                logError('Failed to obtain READ_EXTERNAL_STORAGE permission');
+                return;
+              }
+
+              resolveLocalFileSystemURL(libraryPath, function(dir) {
+                var reader = dir.createReader();
+                reader.readEntries(function(entries) {
+                  var epubs = _.chain(entries)
+                  .filter(function(entry) {
+                    return entry.name.endsWith('.epub');
+                  })
+                  .map(function(entry) {
+                    // TODO: Return actual data -- etsakov@2017.11.13
+                    return {
+                      title: entry.name,
+                      author: 'A. Guy',
+                      rootUrl: 'file://' + entry.fullPath
+                      // nativeURL encodes whitespaces -- etsakov@2017.11.13
+                    };
+                  })
+                  .value();
+
+                  self.libraryData = epubs;
+                  success(epubs);
+                }, logError);
+              }, logError);
+            }, logError);
           return;
 
             if (this.libraryData){
