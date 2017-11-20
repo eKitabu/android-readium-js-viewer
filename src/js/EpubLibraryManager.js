@@ -83,8 +83,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
                   .map(function(entry) {
                     // TODO: Return actual data -- etsakov@2017.11.13
                     return {
-                      title: entry.name,
-                      author: 'A. Guy',
+                      title: entry.name.slice(0, -5), // remove '.epub' extension
                       rootUrl: 'file://' + entry.fullPath
                       // nativeURL encodes whitespaces -- etsakov@2017.11.13
                     };
