@@ -46,17 +46,17 @@
 .no-cover{
 
     cursor: pointer;
-        
+
     height: 190px;
-    
+
     width: 142px;
     font-size: 19px;
-    
-    
+
+
     display: table;
-    
+
     table-layout: fixed;
-    
+
     padding: 0;
     color: white;
     font-family: serif;
@@ -67,7 +67,7 @@
 
     word-wrap: break-word;
     overflow-wrap: break-word;
-    
+
     vertical-align: middle;
     text-align: center;
 
@@ -179,8 +179,8 @@ body.list-view #app-container .library-item img{
     background-repeat:no-repeat;
     background-position:center;
     background-attachment:scroll;
-    
-    background-size:contain;
+
+    background-size:cover;
 
     -webkit-background-clip:content-box;
     -webkit-background-origin:content-box;
@@ -240,25 +240,25 @@ body.list-view .details{
     padding: 0;
 }
 .library-item button[data-link] div p:before {
-    
+
     content: ">>>>";
-    
+
     font-family: sans-serif;
     font-weight: bold;
-    
+
     font-size: 0.5em;
     padding: 0.3em;
     margin: 0;
-    
+
     background-color: black;
     color: white;
-    
+
     border: 0.12em solid white;
-    
+
     opacity: 0.8;
-    
-    width: 100%;    
-    
+
+    width: 100%;
+
     display: inline-block;
     vertical-align: middle;
     line-height: normal;

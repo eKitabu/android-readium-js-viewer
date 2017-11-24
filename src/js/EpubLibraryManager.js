@@ -1,4 +1,4 @@
-define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS'], function ($, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS) {
+define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher'], function ($, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher) {
 
     var LibraryManager = function(){
     };
@@ -29,6 +29,39 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
 
         return path;
     };
+
+    function fetchEpubMetadata(path) {
+      var deferred = $.Deferred();
+      var publicationFetcher = new PublicationFetcher(path, null, window);
+
+      publicationFetcher.initialize(function() {
+        publicationFetcher.getPackageDom(function(packageDom) {
+          var epubData = _.chain(PackageParser.parsePackageDom(packageDom))
+            .pick('author', 'title', 'coverHref')
+            .extend({ rootUrl: path })
+            .value();
+
+          if (!epubData.coverHref) {
+            deferred.resolve(epubData);
+            return;
+          }
+
+          // TODO: setPackageMetadata is needed to initialize
+          // the EncryptionHandler -- etsakov@2017.11.24
+          publicationFetcher.setPackageMetadata({ id: '' }, function() {
+            publicationFetcher.relativeToPackageFetchFileContents(epubData.coverHref, 'blob', function(imageBlob) {
+              epubData.coverHref = window.URL.createObjectURL(imageBlob);
+              deferred.resolve(epubData);
+            }, function(err) {
+              console.error(err);
+              deferred.resolve(epubData);
+            });
+          });
+        });
+      });
+
+      return deferred.promise();
+    }
 
     LibraryManager.prototype = {
 
@@ -76,22 +109,22 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
               resolveLocalFileSystemURL(libraryPath, function(dir) {
                 var reader = dir.createReader();
                 reader.readEntries(function(entries) {
-                  var epubs = _.chain(entries)
+                  var epubPromises = _.chain(entries)
                   .filter(function(entry) {
                     return entry.name.endsWith('.epub');
                   })
                   .map(function(entry) {
-                    // TODO: Return actual data -- etsakov@2017.11.13
-                    return {
-                      title: entry.name.slice(0, -5), // remove '.epub' extension
-                      rootUrl: 'file://' + entry.fullPath
-                      // nativeURL encodes whitespaces -- etsakov@2017.11.13
-                    };
+                    // entry.nativeURL encodes whitespaces -- etsakov@2017.11.13
+                    return fetchEpubMetadata('file://' + entry.fullPath);
                   })
                   .value();
 
-                  self.libraryData = epubs;
-                  success(epubs);
+                  // TODO: Load covers asynchronously. -- etsakov@2017.11.24
+                  $.when.apply($, epubPromises).then(function() {
+                    var epubs = arguments;
+                    self.libraryData = epubs;
+                    success(epubs);
+                  });
                 }, logError);
               }, logError);
             }, logError);
