@@ -220,6 +220,8 @@ Helpers){
             $('#app-container .library-items').append(EmptyLibrary({imagePathPrefix: moduleConfig.imagePathPrefix, strings: Strings}));
             return;
         }
+
+        var coverPromises = [];
         
         var processEpub = function(epubs, count) {
             var epub = epubs[count];
@@ -241,8 +243,20 @@ Helpers){
                 //     //console.log(epub);
                 // }
                 
-                $('.library-items').append(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                //$('.library-items').append(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
                 
+                var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                $('.library-items').append(libItem);
+
+                if (epub.coverLoad) {
+                    coverPromises.push(function(){
+                        return epubData.coverLoad().then(function(epubData) {
+                            var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground}));
+                            $('.library-items').find(libItem).replaceWith(newLibItem);
+                        });
+                    })
+                }
+
                 processEpub(epubs, ++count);
             };
             
@@ -273,6 +287,12 @@ Helpers){
             }
         };
         processEpub(epubs, 0);
+
+        coverPromises.reduce(function(promise,next){
+            return promise.then(function(){
+                return next();
+            })
+        },$.Deferred().resolve());
     }
 
     var readClick = function(e){
