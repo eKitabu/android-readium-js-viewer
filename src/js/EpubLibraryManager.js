@@ -46,17 +46,24 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             return;
           }
 
-          // TODO: setPackageMetadata is needed to initialize
-          // the EncryptionHandler -- etsakov@2017.11.24
-          publicationFetcher.setPackageMetadata({ id: '' }, function() {
-            publicationFetcher.relativeToPackageFetchFileContents(epubData.coverHref, 'blob', function(imageBlob) {
-              epubData.coverHref = window.URL.createObjectURL(imageBlob);
-              deferred.resolve(epubData);
-            }, function(err) {
-              console.error(err);
-              deferred.resolve(epubData);
-            });
-          });
+          epub.coverLoad = function() {
+            var coverDeferred = $.Deferred();
+
+            // TODO: setPackageMetadata is needed to initialize
+              // the EncryptionHandler -- etsakov@2017.11.24
+              publicationFetcher.setPackageMetadata({ id: '' }, function() {
+                publicationFetcher.relativeToPackageFetchFileContents(epubData.coverHref, 'blob', function(imageBlob) {
+                  epubData.coverHref = window.URL.createObjectURL(imageBlob);
+                  coverDeferred.resolve(epubData);
+                }, function(err) {
+                  console.error(err);
+                  coverDeferred.resolve(epubData);
+                });
+              });
+
+            return coverDeferred.promise();
+          }
+
         });
       });
 
