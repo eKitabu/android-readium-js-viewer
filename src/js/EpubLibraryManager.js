@@ -46,13 +46,15 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             return;
           }
 
-          epub.coverLoad = function() {
+          var coverHref = epubData.coverHref;
+          epubData.coverHref = null;
+          epubData.coverLoad = function() {
             var coverDeferred = $.Deferred();
 
             // TODO: setPackageMetadata is needed to initialize
               // the EncryptionHandler -- etsakov@2017.11.24
               publicationFetcher.setPackageMetadata({ id: '' }, function() {
-                publicationFetcher.relativeToPackageFetchFileContents(epubData.coverHref, 'blob', function(imageBlob) {
+                publicationFetcher.relativeToPackageFetchFileContents(coverHref, 'blob', function(imageBlob) {
                   epubData.coverHref = window.URL.createObjectURL(imageBlob);
                   coverDeferred.resolve(epubData);
                 }, function(err) {
@@ -63,6 +65,8 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
 
             return coverDeferred.promise();
           }
+
+          deferred.resolve(epubData);
 
         });
       });
