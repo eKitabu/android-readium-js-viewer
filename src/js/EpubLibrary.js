@@ -123,7 +123,7 @@ Helpers){
         });
 
         $('.details-dialog .modal-body').html(bodyStr);
-        
+
         $('.details-dialog .delete').on('click', function(){
             $('.details-dialog').modal('hide');
             var success = function(){
@@ -160,7 +160,7 @@ Helpers){
         $('.details-dialog').off('shown.bs.modal');
 
         $('#app-container').append(detailsDialogStr);
-        
+
         $('#details-dialog').on('hidden.bs.modal', function () {
             Keyboard.scope('library');
 
@@ -173,22 +173,22 @@ Helpers){
 
 
         $('.details-dialog').modal();
-        
+
         var retrieveDetails = function(packageUrl) {
-            
+
             if (!packageUrl || packageUrl.indexOf(".opf") < 0) {
                 console.warn("no package path (OPF within zipped EPUB archive?): " + packageUrl);
             }
-            
+
             libraryManager.retrieveFullEpubDetails(packageUrl, bookRoot, rootDir, noCoverBg, showDetailsDialog, showError);
         };
-        
+
         console.log("OPF package URL: " + url);
         if (url && url.indexOf(".opf") < 0) {
-            
-            var urlContainerXml = url + "META-INF/container.xml"; 
+
+            var urlContainerXml = url + "META-INF/container.xml";
             $.get(urlContainerXml, function(data){
-    
+
                 if(typeof(data) === "string" ) {
                     var parser = new window.DOMParser;
                     data = parser.parseFromString(data, 'text/xml');
@@ -196,12 +196,12 @@ Helpers){
                 var $rootfile = $('rootfile', data);
                 var rootFilePath = $rootfile.attr('full-path');
                 console.log("OPF package path (root-file from container.xml): " + rootFilePath);
-                
+
                 var packageUrl = url + (Helpers.EndsWith(url, "/") ? "" : "/") + rootFilePath;
-            
+
                 console.log("OPF package URL (from container.xml): " + packageUrl);
                 retrieveDetails(packageUrl);
-    
+
             }).fail(function() {
                 //console.warn(arguments);
                 console.error("FAILED OPF package URL (from container.xml): " + urlContainerXml);
@@ -220,7 +220,9 @@ Helpers){
             $('#app-container .library-items').append(EmptyLibrary({imagePathPrefix: moduleConfig.imagePathPrefix, strings: Strings}));
             return;
         }
-        
+
+        var coverPromises = [];
+
         var processEpub = function(epubs, count) {
             var epub = epubs[count];
             if (!epub) { // count >= epubs.length
@@ -232,7 +234,7 @@ Helpers){
             if (epub.isSubLibraryLink) {
                 noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
             }
-            
+
             var createLibraryItem = function() {
 
                 // See --COMMENT-- below!
@@ -240,29 +242,41 @@ Helpers){
                 //     console.warn("no epub.packagePath (OPF within zipped EPUB archive?): " + epub.rootUrl);
                 //     //console.log(epub);
                 // }
-                
-                $('.library-items').append(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-                
+
+                //$('.library-items').append(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+
+                var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                $('.library-items').append(libItem);
+
+                if (epub.coverLoad) {
+                    coverPromises.push(function(){
+                        return epub.coverLoad().then(function(epub) {
+                            var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                            $('.library-items').find(libItem).replaceWith(newLibItem);
+                        });
+                    })
+                }
+
                 processEpub(epubs, ++count);
             };
-            
+
             if (!epub.isSubLibraryLink && !epub.packagePath) {
-                
+
                 createLibraryItem();
-                
+
                 // --COMMENT--
                 // Code below works, but just here to demonstrate how the package OPF path can be resolved whilst populating the library view. Because the HTTP requests for each ebook introduce huge lag, instead we resolve the OPF path on-demand, when user chooses to see the EPUB details / metadata dialog popup (see loadDetails() function above, which itself emits an HTTP request to get the actual OPF file XML payload, via LibraryManager.retrieveFullEpubDetails())
                 // $.get(epub.rootUrl + "/META-INF/container.xml", function(data){
-        
+
                 //     if(typeof(data) === "string" ) {
                 //         var parser = new window.DOMParser;
                 //         data = parser.parseFromString(data, 'text/xml');
                 //     }
                 //     var $rootfile = $('rootfile', data);
                 //     epub.packagePath = $rootfile.attr('full-path');
-                
+
                 //     createLibraryItem();
-        
+
                 // }).fail(function() {
                 //     //console.warn(arguments);
                 //     createLibraryItem();
@@ -273,6 +287,12 @@ Helpers){
             }
         };
         processEpub(epubs, 0);
+
+        coverPromises.reduce(function(promise,next){
+            return promise.then(function(){
+                return next();
+            })
+        },$.Deferred().resolve());
     }
 
     var readClick = function(e){
@@ -280,7 +300,7 @@ Helpers){
         //var ebookURL = urlParams['epub'];
         var libraryURL = urlParams['epubs'];
         var embedded = urlParams['embedded'];
-            
+
         var ebookURL = $(this).attr('data-book');
         if (ebookURL) {
             var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
@@ -289,12 +309,12 @@ Helpers){
         else {
             var libURL = $(this).attr('data-library');
             if (libURL) {
-                
+
                 // TODO: this doesn't work, so we refresh the whole page, bypassing pushState (replaceState is used instead after reload)
                 // libraryManager.resetLibraryData();
                 // var eventPayload = libURL;
                 // $(window).triggerHandler('loadlibrary', eventPayload);
-                            
+
                 var URLPATH =
                 window.location ? (
                     window.location.protocol
@@ -304,9 +324,9 @@ Helpers){
                     + window.location.pathname
                 ) : 'index.html'
                 ;
-                
+
                 var url = URLPATH + '?epubs=' + encodeURIComponent(libURL);
-                
+
                 window.location = url;
             } else {
                 var linkURL = $(this).attr('data-link');
@@ -363,12 +383,12 @@ Helpers){
     }
 
     var importZippedEpub = function(file) {
-        
+
         if (!window.Blob || !window.File) return;
-        
+
         if (!(file instanceof Blob) || !(file instanceof File)) return;
-        
-        
+
+
         var title = Strings.import_dlg_title + " [ " + file.name + " ]";
         Dialogs.showModalProgress(title, Strings.import_dlg_message);
 
@@ -383,24 +403,24 @@ Helpers){
 
     var importZippedEpubs_CANCELLED = false;
     var importZippedEpubs = function(files, i) {
-    
+
         if (!window.Blob || !window.File) return;
 
          if (i == 0) { // first call
             importZippedEpubs_CANCELLED = false;
         } else {
             if (importZippedEpubs_CANCELLED) {
-                
+
                 handleLibraryChange();
 
                 setTimeout(function(){
                     Dialogs.showModalMessage(Strings.i18n_add_book, Strings.i18n_cancel + " - " + Strings.import_dlg_title);
                 }, 800);
-                
+
                 return; // break the iteration
             }
         }
-        
+
         if (i >= files.length) { // last call
             handleLibraryChange();
             return;
@@ -435,7 +455,7 @@ Helpers){
         }
 
         Dialogs.updateProgress(0, Messages.PROGRESS_EXTRACTING, file.name);
-                
+
         libraryManager.handleZippedEpub({
             file: file,
             overwrite: promptForReplace,
@@ -445,8 +465,8 @@ Helpers){
             },
             progress: Dialogs.updateProgress,
             error: function(errorCode, data) {
-                
-                // TODO: collapse multiple errors into a single user prompt 
+
+                // TODO: collapse multiple errors into a single user prompt
                 //showError(errorCode, data);
 
                 var msg = Strings.err_unknown;
@@ -471,7 +491,7 @@ Helpers){
                 }
                 Dialogs.updateModalProgressTitle(Strings.err_dlg_title + " (" + msg + ")" + fileInfo);
                 //Dialogs.showModalMessage(Strings.err_dlg_title, msg);
-                
+
                 setTimeout(function(){
                     nextImportEPUB();
                 }, 500); // short error report, then let's move to the next item.
@@ -481,7 +501,7 @@ Helpers){
 
     var handleFileSelect = function(evt){
         $('#add-epub-dialog').modal('hide');
-                
+
         if (evt.target.files.length > 1) {
             importZippedEpubs(evt.target.files, 0);
             return;
@@ -503,7 +523,7 @@ Helpers){
             error: showError
         });
     }
-    
+
     var handleUrlSelect = function(){
         var url = $('#url-upload').val();
         $('#add-epub-dialog').modal('hide');
@@ -521,7 +541,7 @@ Helpers){
         // TODO: also allow import of URL and directory select
         // See libraryManager.canHandleUrl() + handleUrlSelect()
         // See libraryManager.canHandleDirectory() + handleDirSelect()
-        
+
         if (Array.isArray(ebook)) {
             importZippedEpubs(ebook, 0);
             return;
@@ -534,7 +554,7 @@ Helpers){
         Dialogs.showModalProgress(Strings.migrate_dlg_title, Strings.migrate_dlg_message);
         libraryManager.handleMigration({
             success: function(){
-                
+
                 // Note: automatically JSON.stringify's the passed value!
                 Settings.put('needsMigration', false, $.noop);
 
@@ -555,13 +575,13 @@ Helpers){
         var $appContainer = $('#app-container');
         $appContainer.empty();
         SettingsDialog.initDialog();
-        
+
         $appContainer.append(AddEpubDialog({
             canHandleUrl : libraryManager.canHandleUrl(),
             canHandleDirectory : libraryManager.canHandleDirectory(),
             strings: Strings
         }));
-        
+
         Versioning.getVersioningInfo(function(version){
             $appContainer.append(AboutDialog({imagePathPrefix: moduleConfig.imagePathPrefix, strings: Strings, dateTimeString: version.dateTimeString, viewerJs: version.readiumJsViewer, readiumJs: version.readiumJs, sharedJs: version.readiumSharedJs, cfiJs: version.readiumCfiJs}));
         });
@@ -663,19 +683,19 @@ Helpers){
     var applyKeyboardSettingsAndLoadUi = function(data)
     {
         if (data && data.epubs && (typeof data.epubs == "string")) {
-            
+
             // this is normally init'ed at page launch using the "epubs" URL GET query parameter,
-            // but needs manually setting when using pushState() to refresh the page contents with a different library source 
+            // but needs manually setting when using pushState() to refresh the page contents with a different library source
             moduleConfig.epubLibraryPath = data.epubs;
         }
-        
+
         // override current scheme with user options
         Settings.get('reader', function(json)
         {
            Keyboard.applySettings(json);
 
            loadLibraryUI();
-           
+
            if (data && data.importEPUB) { // File/Blob, possibly Array
                importEpub(data.importEPUB);
            }
@@ -688,6 +708,6 @@ Helpers){
     return {
         loadUI : applyKeyboardSettingsAndLoadUi,
         unloadUI : unloadLibraryUI,
-        importEpub : importEpub 
+        importEpub : importEpub
     };
 });
