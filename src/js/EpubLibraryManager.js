@@ -131,11 +131,12 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
                   .value();
 
                   // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-                  $.when.apply($, epubPromises).then(function() {
-                    var epubs = arguments;
-                    self.libraryData = epubs;
+                  //$.when.apply($, epubPromises).then(function() {
+                    //var epubs = arguments;
+                    self.libraryData = epubPromises;
                     success(epubs);
-                  });
+                  //});
+
                 }, logError);
               }, logError);
             }, logError);
