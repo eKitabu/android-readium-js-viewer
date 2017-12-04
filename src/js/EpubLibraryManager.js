@@ -48,22 +48,25 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
 
           var coverHref = epubData.coverHref;
           epubData.coverHref = null;
-          epubData.coverLoad = function() {
-            var coverDeferred = $.Deferred();
+          if (!coverHref.endsWith('html')) { //readium cannot parse htmls (yet)
+            epubData.coverLoad = function() {
+                var coverDeferred = $.Deferred();
 
-            // TODO: setPackageMetadata is needed to initialize
-              // the EncryptionHandler -- etsakov@2017.11.24
-              publicationFetcher.setPackageMetadata({ id: '' }, function() {
-                publicationFetcher.relativeToPackageFetchFileContents(coverHref, 'blob', function(imageBlob) {
-                  epubData.coverHref = window.URL.createObjectURL(imageBlob);
-                  coverDeferred.resolve(epubData);
-                }, function(err) {
-                  console.error(err);
-                  coverDeferred.resolve(epubData);
-                });
-              });
+                // TODO: setPackageMetadata is needed to initialize
+                  // the EncryptionHandler -- etsakov@2017.11.24
+                  publicationFetcher.setPackageMetadata({ id: '' }, function() {
+                    //TODO: extract image from html if needs be - jorro@2017.12.04
+                    publicationFetcher.relativeToPackageFetchFileContents(coverHref, 'blob', function(imageBlob) {
+                      epubData.coverHref = window.URL.createObjectURL(imageBlob);
+                      coverDeferred.resolve(epubData);
+                    }, function(err) {
+                      console.error(err);
+                      coverDeferred.resolve(epubData);
+                    });
+                  });
 
-            return coverDeferred.promise();
+                return coverDeferred.promise();
+              }
           }
 
           deferred.resolve(epubData);
