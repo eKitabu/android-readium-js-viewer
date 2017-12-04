@@ -137,7 +137,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
                   //$.when.apply($, epubPromises).then(function() {
                     //var epubs = arguments;
                     self.libraryData = epubPromises;
-                    success(epubs);
+                    success(epubPromises);
                   //});
 
                 }, logError);

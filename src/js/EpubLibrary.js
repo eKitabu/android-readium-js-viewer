@@ -226,21 +226,23 @@ Helpers){
         epubs.reduce(function(epubPromise,next){
             return epubPromise.then(function(epub){
 
-                var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
-                if (epub.isSubLibraryLink) {
-                    noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
-                }
+                if (epub) {
+                    var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
+                    if (epub.isSubLibraryLink) {
+                        noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
+                    }
 
-                var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-                $('.library-items').append(libItem);
+                    var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                    $('.library-items').append(libItem);
 
-                if (epub.coverLoad) {
-                    coverPromises.push(function(){
-                        return epub.coverLoad().then(function(epub) {
-                            var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-                            $('.library-items').find(libItem).replaceWith(newLibItem);
-                        });
-                    })
+                    if (epub.coverLoad) {
+                        coverPromises.push(function(){
+                            return epub.coverLoad().then(function(epub) {
+                                var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                                $('.library-items').find(libItem).replaceWith(newLibItem);
+                            });
+                        })
+                    }
                 }
 
                 return next();
