@@ -221,16 +221,17 @@ Helpers){
             return;
         }
 
-        var coverPromises = [];
-
-        epubs.reduce(function(epubPromise,next){
+        //var coverPromises = [];
+        $('.details').on('click', loadDetails);
+        var count = 0;
+        return epubs.reduce(function(epubPromise,next){
             return epubPromise.then(function(epub){
                 if (epub) {
                     var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
                     if (epub.isSubLibraryLink) {
                         noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
                     }
-
+                    count++;
                     var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
                     $('.library-items').append(libItem);
                 }
@@ -239,7 +240,7 @@ Helpers){
             })
         },$.Deferred().resolve());
 
-        $('.details').on('click', loadDetails);
+        
         // coverPromises.reduce(function(promise,next){
         //     return promise.then(function(){
         //         return next();

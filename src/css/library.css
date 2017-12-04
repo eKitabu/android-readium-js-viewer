@@ -53,7 +53,7 @@
     font-size: 19px;
 
 
-    display: table;
+    display: block; /* table */
 
     table-layout: fixed;
 
@@ -180,7 +180,7 @@ body.list-view #app-container .library-item img{
     background-position:center;
     background-attachment:scroll;
 
-    background-size:cover;
+    background-size:contain;
 
     -webkit-background-clip:content-box;
     -webkit-background-origin:content-box;
