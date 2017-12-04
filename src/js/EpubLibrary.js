@@ -16,6 +16,7 @@ define([
 'hgn!readium_js_viewer_html_templates/about-dialog.html',
 'hgn!readium_js_viewer_html_templates/details-body.html',
 'hgn!readium_js_viewer_html_templates/add-epub-dialog.html',
+'hgn!readium_js_viewer_html_templates/loading.html',
 './ReaderSettingsDialog',
 './Dialogs',
 './workers/Messages',
@@ -42,6 +43,7 @@ DetailsDialog,
 AboutDialog,
 DetailsBody,
 AddEpubDialog,
+LoadingDiv,
 SettingsDialog,
 Dialogs,
 Messages,
@@ -76,7 +78,7 @@ Helpers){
     //console.debug("SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                 spinner.isSpinning = true;
                 spinner.spin($('#app-container')[0]);
-
+                $('#app-container').append(LoadingDiv());
                 spinner.willSpin = false;
 
             }, 100);
@@ -86,6 +88,7 @@ Helpers){
             {
 //console.debug("!! SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                 spinner.stop();
+                $('#app-container .loading').remove();
                 spinner.isSpinning = false;
             }
             else if (spinner.willSpin)
