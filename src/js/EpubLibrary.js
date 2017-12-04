@@ -223,24 +223,52 @@ Helpers){
 
         //var coverPromises = [];
         $('.details').on('click', loadDetails);
-        var count = 0;
-        return epubs.reduce(function(epubPromise,next){
-            return epubPromise.then(function(epub){
-                if (epub) {
-                    var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
-                    if (epub.isSubLibraryLink) {
-                        noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
-                    }
-                    count++;
-                    var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-                    $('.library-items').append(libItem);
+        // var count = 0;
+        // return epubs.reduce(function(epubPromise,next){
+        //     return epubPromise.then(function(epub){
+        //         if (epub) {
+        //             var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
+        //             if (epub.isSubLibraryLink) {
+        //                 noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
+        //             }
+        //             count++;
+        //             var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+        //             $('.library-items').append(libItem);
+        //         }
+
+        //         return next;
+        //     })
+        // },$.Deferred().resolve());
+
+        epubs.forEach(function(epubPromise,count) {
+            epubPromise.then(function(epub){
+                var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
+                if (epub.isSubLibraryLink) {
+                    noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
+                }
+                var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
+                $('.library-items').append(libItem);
+
+                if (epub.coverLoad) {
+                    coverPromises.push(function(){
+                        return epubData.coverLoad().then(function(epubData) {
+                            var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground}));
+                            $('.library-items').find(libItem).replaceWith(newLibItem);
+                        });
+                    })
                 }
 
-                return next;
+                if (count == epubs.length-1) {
+                    coverPromises.reduce(function(promise,next){
+                        return promise.then(function(){
+                            return next();
+                        })
+                    },$.Deferred().resolve());
+                }
             })
-        },$.Deferred().resolve());
+        });
 
-        
+
         // coverPromises.reduce(function(promise,next){
         //     return promise.then(function(){
         //         return next();
