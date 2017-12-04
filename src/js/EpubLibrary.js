@@ -245,7 +245,7 @@ Helpers){
                     }
                 }
 
-                return next();
+                return next;
             })
         },$.Deferred().resolve());
 
