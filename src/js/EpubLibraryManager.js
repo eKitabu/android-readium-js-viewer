@@ -48,7 +48,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
 
           //var coverHref = epubData.coverHref;
           //epubData.coverHref = null;
-          if (coverHref.endsWith('html')) { //readium cannot parse htmls (yet)
+          if (epubData.coverHref.endsWith('html')) { //readium cannot parse htmls (yet)
             epubData.coverHref = null;
           }
           else {
