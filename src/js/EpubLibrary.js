@@ -225,7 +225,6 @@ Helpers){
 
         epubs.reduce(function(epubPromise,next){
             return epubPromise.then(function(epub){
-
                 if (epub) {
                     var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
                     if (epub.isSubLibraryLink) {
@@ -234,15 +233,6 @@ Helpers){
 
                     var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
                     $('.library-items').append(libItem);
-
-                    if (epub.coverLoad) {
-                        coverPromises.push(function(){
-                            return epub.coverLoad().then(function(epub) {
-                                var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-                                $('.library-items').find(libItem).replaceWith(newLibItem);
-                            });
-                        })
-                    }
                 }
 
                 return next;
@@ -250,11 +240,11 @@ Helpers){
         },$.Deferred().resolve());
 
         $('.details').on('click', loadDetails);
-        coverPromises.reduce(function(promise,next){
-            return promise.then(function(){
-                return next();
-            })
-        },$.Deferred().resolve());
+        // coverPromises.reduce(function(promise,next){
+        //     return promise.then(function(){
+        //         return next();
+        //     })
+        // },$.Deferred().resolve());
 
         // var processEpub = function(epubs, count) {
         //     var epub = epubs[count];
