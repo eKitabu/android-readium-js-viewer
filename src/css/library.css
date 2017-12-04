@@ -263,3 +263,11 @@ body.list-view .details{
     vertical-align: middle;
     line-height: normal;
 }
+
+.loading {
+    text-align:center;
+    font-size: 22px;
+    top: 48%;
+    width:100%;
+    position: absolute;
+}

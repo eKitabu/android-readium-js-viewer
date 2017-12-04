@@ -4,6 +4,7 @@ define([
 'bootstrap',
 'bootstrapA11y',
 'StorageManager',
+'./Spinner',
 'Settings',
 './EpubLibraryManager',
 'i18nStrings',
@@ -15,6 +16,7 @@ define([
 'hgn!readium_js_viewer_html_templates/about-dialog.html',
 'hgn!readium_js_viewer_html_templates/details-body.html',
 'hgn!readium_js_viewer_html_templates/add-epub-dialog.html',
+'hgn!readium_js_viewer_html_templates/loading.html',
 './ReaderSettingsDialog',
 './Dialogs',
 './workers/Messages',
@@ -29,6 +31,7 @@ $,
 bootstrap,
 bootstrapA11y,
 StorageManager,
+spinner,
 Settings,
 libraryManager,
 Strings,
@@ -40,6 +43,7 @@ DetailsDialog,
 AboutDialog,
 DetailsBody,
 AddEpubDialog,
+LoadingDiv,
 SettingsDialog,
 Dialogs,
 Messages,
@@ -53,6 +57,47 @@ Helpers){
     var heightRule,
         noCoverRule;
         //maxHeightRule
+
+    var spin = function(on)
+    {
+        if (on) {
+    //console.error("do SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+            if (spinner.willSpin || spinner.isSpinning) return;
+
+            spinner.willSpin = true;
+
+            setTimeout(function()
+            {
+                if (spinner.stopRequested)
+                {
+    //console.debug("STOP REQUEST: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+                    spinner.willSpin = false;
+                    spinner.stopRequested = false;
+                    return;
+                }
+    //console.debug("SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+                spinner.isSpinning = true;
+                spinner.spin($('#app-container')[0]);
+                $('#app-container').append(LoadingDiv());
+                spinner.willSpin = false;
+
+            }, 100);
+        } else {
+
+            if (spinner.isSpinning)
+            {
+//console.debug("!! SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+                spinner.stop();
+                $('#app-container .loading').remove();
+                spinner.isSpinning = false;
+            }
+            else if (spinner.willSpin)
+            {
+//console.debug("!! SPIN REQ: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
+                spinner.stopRequested = true;
+            }
+        }
+    };
 
     var findHeightRule = function(){
 
@@ -216,6 +261,8 @@ Helpers){
     var loadLibraryItems = function(epubs){
         $('#app-container .library-items').remove();
         $('#app-container').append(LibraryBody({}));
+
+        spin(false);
         if (!epubs.length){
             $('#app-container .library-items').append(EmptyLibrary({imagePathPrefix: moduleConfig.imagePathPrefix, strings: Strings}));
             return;
@@ -624,6 +671,7 @@ Helpers){
 
         Analytics.trackView('/library');
         var $appContainer = $('#app-container');
+        spin(true);
         $appContainer.empty();
         SettingsDialog.initDialog();
 
