@@ -63,7 +63,7 @@
 }
 
 .no-cover p{
-    display: table-cell;
+    display: block; /* table-cell; */
 
     word-wrap: break-word;
     overflow-wrap: break-word;

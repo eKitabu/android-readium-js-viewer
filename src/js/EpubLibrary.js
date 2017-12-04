@@ -221,7 +221,7 @@ Helpers){
             return;
         }
 
-        //var coverPromises = [];
+        var coverPromises = [];
         $('.details').on('click', loadDetails);
         // var count = 0;
         // return epubs.reduce(function(epubPromise,next){
@@ -240,7 +240,8 @@ Helpers){
         //     })
         // },$.Deferred().resolve());
 
-        epubs.forEach(function(epubPromise,count) {
+        var count = 0;
+        epubs.forEach(function(epubPromise) {
             epubPromise.then(function(epub){
                 var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
                 if (epub.isSubLibraryLink) {
@@ -251,12 +252,16 @@ Helpers){
 
                 if (epub.coverLoad) {
                     coverPromises.push(function(){
-                        return epubData.coverLoad().then(function(epubData) {
+                        return epub.coverLoad().then(function(epubData) {
                             var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground}));
                             $('.library-items').find(libItem).replaceWith(newLibItem);
+                            epub.coverLoad = null;
                         });
                     })
+
                 }
+
+                count++;
 
                 if (count == epubs.length-1) {
                     coverPromises.reduce(function(promise,next){
@@ -296,7 +301,7 @@ Helpers){
         //         // }
 
         //         //$('.library-items').append(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-                
+
         //         var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
         //         $('.library-items').append(libItem);
 
@@ -311,24 +316,24 @@ Helpers){
 
         //         processEpub(epubs, ++count);
         //     };
-            
+
         //     if (!epub.isSubLibraryLink && !epub.packagePath) {
-                
+
         //         createLibraryItem();
-                
+
         //         // --COMMENT--
         //         // Code below works, but just here to demonstrate how the package OPF path can be resolved whilst populating the library view. Because the HTTP requests for each ebook introduce huge lag, instead we resolve the OPF path on-demand, when user chooses to see the EPUB details / metadata dialog popup (see loadDetails() function above, which itself emits an HTTP request to get the actual OPF file XML payload, via LibraryManager.retrieveFullEpubDetails())
         //         // $.get(epub.rootUrl + "/META-INF/container.xml", function(data){
-        
+
         //         //     if(typeof(data) === "string" ) {
         //         //         var parser = new window.DOMParser;
         //         //         data = parser.parseFromString(data, 'text/xml');
         //         //     }
         //         //     var $rootfile = $('rootfile', data);
         //         //     epub.packagePath = $rootfile.attr('full-path');
-                
+
         //         //     createLibraryItem();
-        
+
         //         // }).fail(function() {
         //         //     //console.warn(arguments);
         //         //     createLibraryItem();
