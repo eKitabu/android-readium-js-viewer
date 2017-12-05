@@ -147,6 +147,10 @@ body:not(.list-view) #app-container .library-item .info-wrap button {
     width: 110%;
 }
 
+body:not(.list-view) #app-container .library-item .book-info {
+    display: none;
+}
+
 body.list-view #app-container .library-item .book-info,
 body.list-view #app-container .library-item .info-wrap{
     display: table-cell;
