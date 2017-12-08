@@ -162,8 +162,13 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         libraryView(libraryURL, importEPUB);
     });
 
-    document.addEventListener("backbutton", function() {
-      $(window).trigger('loadlibrary');
+    document.addEventListener("backbutton", function(event) {
+      if($(".library-items").length === 0) {
+        event.stopPropagation();
+        $(window).trigger('loadlibrary');
+      } else {
+        window.plugins.appMinimize.minimize();
+      }
     }, false);
 
     $(document.body).tooltip({
