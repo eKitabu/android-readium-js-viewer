@@ -54,6 +54,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             // TODO: setPackageMetadata is needed to initialize
               // the EncryptionHandler -- etsakov@2017.11.24
               publicationFetcher.setPackageMetadata({ id: '' }, function() {
+                //TODO: extract image from html if needs be - jorro@2017.12.04
                 publicationFetcher.relativeToPackageFetchFileContents(coverHref, 'blob', function(imageBlob) {
                   epubData.coverHref = window.URL.createObjectURL(imageBlob);
                   coverDeferred.resolve(epubData);
@@ -131,11 +132,12 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
                   .value();
 
                   // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-                  $.when.apply($, epubPromises).then(function() {
-                    var epubs = arguments;
-                    self.libraryData = epubs;
-                    success(epubs);
-                  });
+                  //$.when.apply($, epubPromises).then(function() {
+                    //var epubs = arguments;
+                    self.libraryData = epubPromises;
+                    success(epubPromises);
+                  //});
+
                 }, logError);
               }, logError);
             }, logError);

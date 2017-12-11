@@ -53,7 +53,7 @@
     font-size: 19px;
 
 
-    display: table;
+    display: block; /* table */
 
     table-layout: fixed;
 
@@ -63,7 +63,7 @@
 }
 
 .no-cover p{
-    display: table-cell;
+    display: block; /* table-cell; */
 
     word-wrap: break-word;
     overflow-wrap: break-word;
@@ -147,6 +147,10 @@ body:not(.list-view) #app-container .library-item .info-wrap button {
     width: 110%;
 }
 
+body:not(.list-view) #app-container .library-item .book-info {
+    display: none;
+}
+
 body.list-view #app-container .library-item .book-info,
 body.list-view #app-container .library-item .info-wrap{
     display: table-cell;
@@ -180,7 +184,7 @@ body.list-view #app-container .library-item img{
     background-position:center;
     background-attachment:scroll;
 
-    background-size:cover;
+    background-size:contain;
 
     -webkit-background-clip:content-box;
     -webkit-background-origin:content-box;
