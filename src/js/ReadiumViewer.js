@@ -163,8 +163,8 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
     });
 
     document.addEventListener("backbutton", function(event) {
+      event.stopPropagation();
       if($(".library-items").length === 0) {
-        event.stopPropagation();
         $(window).trigger('loadlibrary');
       } else {
         window.plugins.appMinimize.minimize();
