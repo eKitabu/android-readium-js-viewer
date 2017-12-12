@@ -29,7 +29,7 @@ require.config({
             'underscore', 'URIjs', 'punycode', 'SecondLevelDomains', 'IPv6',
             'jquerySizes', 'domReady', 'eventEmitter', 'console_shim',
             'rangy', 'rangy-core', 'rangy-textrange', 'rangy-highlighter', 'rangy-cssclassapplier', 'rangy-position',
-            'pouchdb']
+            'pouchdb', 'papaparse']
         }
     ]
 });

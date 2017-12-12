@@ -160,9 +160,9 @@ boom@2.x.x:
   dependencies:
     hoek "2.x.x"
 
-bootstrap-accessibility-plugin@paypal/bootstrap-accessibility-plugin:
+"bootstrap-accessibility-plugin@github:paypal/bootstrap-accessibility-plugin":
   version "1.0.5"
-  resolved "https://codeload.github.com/paypal/bootstrap-accessibility-plugin/tar.gz/4f1f5720e095dca98b75127759c006b78433f99e"
+  resolved "https://codeload.github.com/paypal/bootstrap-accessibility-plugin/tar.gz/5d1b9bd823c54e9c2e40c80bf47c3149db646d01"
 
 bootstrap@3.x:
   version "3.3.7"
@@ -648,7 +648,7 @@ growl@1.9.2:
   version "1.9.2"
   resolved "https://registry.yarnpkg.com/growl/-/growl-1.9.2.tgz#0ea7743715db8d8de2c5ede1775e1b45ac85c02f"
 
-grunt-selenium-webdriver@levexis/grunt-selenium-webdriver:
+"grunt-selenium-webdriver@github:levexis/grunt-selenium-webdriver":
   version "0.2.530"
   resolved "https://codeload.github.com/levexis/grunt-selenium-webdriver/tar.gz/e9f63af80c8e6738b00812370c6f1ba13c5dc817"
   dependencies:
@@ -752,7 +752,7 @@ http-proxy@^1.8.1:
     eventemitter3 "1.x.x"
     requires-port "1.x.x"
 
-http-server@danielweck/http-server:
+"http-server@github:danielweck/http-server":
   version "0.10.0"
   resolved "https://codeload.github.com/danielweck/http-server/tar.gz/1d74e29a2e5609ee4e8805122051cccaba160caa"
   dependencies:
@@ -861,7 +861,7 @@ isstream@~0.1.2:
   version "0.1.2"
   resolved "https://registry.yarnpkg.com/isstream/-/isstream-0.1.2.tgz#47e63f7af55afa6f92e1500e690eb8b8529c099a"
 
-jath@danielweck/jath:
+"jath@github:danielweck/jath":
   version "0.0.3"
   resolved "https://codeload.github.com/danielweck/jath/tar.gz/ed637b98dda03f763346b044b33f17f7bf6ab64c"
 
@@ -925,7 +925,7 @@ kew@~0.7.0:
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/kew/-/kew-0.7.0.tgz#79d93d2d33363d6fdd2970b335d9141ad591d79b"
 
-keymaster@danielweck/keymaster:
+"keymaster@github:danielweck/keymaster":
   version "1.6.3"
   resolved "https://codeload.github.com/danielweck/keymaster/tar.gz/aec038984d37553b181175d7315180c195c2d9af"
 
@@ -1020,7 +1020,7 @@ map-stream@~0.1.0:
   version "0.1.0"
   resolved "https://registry.yarnpkg.com/map-stream/-/map-stream-0.1.0.tgz#e56aa94c4c8055a16404a0674b78f215f7c8e194"
 
-mathjax-single-file@danielweck/MathJax-single-file:
+"mathjax-single-file@github:danielweck/MathJax-single-file":
   version "10.0.0"
   resolved "https://codeload.github.com/danielweck/MathJax-single-file/tar.gz/c0b75197f9299e5631a62c7cf86baddf045d4b6a"
 
@@ -1183,6 +1183,10 @@ optimist@0.6.x:
   dependencies:
     minimist "~0.0.1"
     wordwrap "~0.0.2"
+
+papaparse@^4.3.6:
+  version "4.3.6"
+  resolved "https://registry.yarnpkg.com/papaparse/-/papaparse-4.3.6.tgz#9566eda0ecab13afcb740a62381c699f486cb145"
 
 parse-json@^2.2.0:
   version "2.2.0"

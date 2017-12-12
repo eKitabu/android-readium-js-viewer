@@ -116,6 +116,8 @@ dependencies:
 
     "pouchdb": "^6.3.4"
 
+    "papaparse": "^4.3.6"
+
 #####################################################################
 # These dependencies can be fetched by using the "--dev" option
 # in "npm install --dev readium-js-viewer".

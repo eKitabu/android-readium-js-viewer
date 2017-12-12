@@ -96,6 +96,9 @@ require.config({
 
         'pouchdb':
             process._RJS_rootDir(3) + '/node_modules/pouchdb/dist/pouchdb.min'
+
+        'papaparse':
+            process._RJS_rootDir(3) + '/node_modules/papaparse/papaparse.min'
     },
 
     shim:

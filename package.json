@@ -50,7 +50,8 @@
     "npm-run-all": "latest",
     "opener": "latest",
     "http-server": "github:danielweck/http-server",
-    "pouchdb": "^6.3.4"
+    "pouchdb": "^6.3.4",
+    "papaparse": "^4.3.6"
   },
   "devDependencies": {
     "keymaster": "github:danielweck/keymaster",
