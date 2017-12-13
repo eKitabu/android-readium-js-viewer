@@ -282,6 +282,7 @@ table.filterCategoriesTable th
     background-color: black;
     color: white;
     text-transform: uppercase;
+    text-align: center;
     padding:21px;
     font-weight: 900;
 }
@@ -296,7 +297,7 @@ table.filterCategoriesTable,
 table.filterCategoriesTable th,
 table.filterCategoriesTable td
 {
-    padding-left:35px;
+    /*padding-left:35px;*/
     border: 2px solid rgba(255,255,255,0.3);
 }
 
