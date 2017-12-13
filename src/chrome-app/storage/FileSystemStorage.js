@@ -306,7 +306,7 @@ define(['readium_js_viewer/workers/Messages'], function(Messages){
                 success();
                 return;
             }
-            requestFileSystem(self.PERSISTENT, 5*1024*1024*1024, function(fs){
+            requestFileSystem(self.PERSISTENT, 0 /*5*1024*1024*1024*/, function(fs){
                 rootDir = fs.root;
                 success();
             }, wrapErrorHandler('init', '/', error));
