@@ -1,4 +1,4 @@
-define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher'], function ($, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher) {
+define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher'], function ($, _, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher) {
 
     var LibraryManager = function(){
     };
@@ -30,6 +30,32 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
         return path;
     };
 
+    //XXX mock categoryData
+    function extentMethaData(epubData) {
+        categories = ['Class 4',
+        'Class 5',
+        'Class 6',
+        'Class 7',
+        'Class 8',
+        'Form 1',
+        'Form 2',
+        'Form 3'];
+        subjects = [
+        'C.R.E',
+        'I.R.E',
+        'English',
+        'Kiswahili',
+        'Mathematics',
+        'Science',
+        'Social Studies',
+        'English Readers',
+        'Kiswahili Readers'];
+
+        var categories = _.chain(categories).sample(2).concat(_.sample(subjects, 3)).value()
+
+        epubData.categories = categories;
+    }
+
     function fetchEpubMetadata(path) {
       var deferred = $.Deferred();
       var publicationFetcher = new PublicationFetcher(path, null, window);
@@ -41,6 +67,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             .extend({ rootUrl: path })
             .value();
 
+          extentMethaData(epubData);
           if (!epubData.coverHref) {
             deferred.resolve(epubData);
             return;
@@ -185,8 +212,7 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             } else {
                 EpubLibraryOPDS.tryParse(indexUrl, dataSuccess, dataFail);
             }
-        },
-
+        },        
         deleteEpubWithId : function(id, success, error){
             WorkerProxy.deleteEpub(id, this.libraryData, {
                 success: this._refreshLibraryFromWorker.bind(this, success),

@@ -268,10 +268,168 @@ body.list-view .details{
     line-height: normal;
 }
 
+table.filterCategoriesTable
+{
+    width: 31%;
+    font-size: 16px;
+    display: inline-table;
+    vertical-align: middle;
+    margin: 0 82px;
+}
+
+table.filterCategoriesTable th
+{
+    background-color: black;
+    color: white;
+    text-transform: uppercase;
+    padding:21px;
+    font-weight: 900;
+}
+
+table.filterCategoriesTable td
+{
+    padding: 14px;
+    background: rgba(0,0,0,0.15);
+}
+
+table.filterCategoriesTable,
+table.filterCategoriesTable th,
+table.filterCategoriesTable td
+{
+    padding-left:35px;
+    border: 2px solid rgba(255,255,255,0.3);
+}
+
+table.filterCategoriesTable td.selected
+{
+    background: rgba(237,28,36,0.15);
+}
+
+.removeCategory
+{
+    opacity: 0.5;
+    margin-left: 3px;
+    font-size: 21px;
+    font-weight: 700;
+    line-height: 1;
+    color: #000;
+    text-shadow: 0 1px 0 #fff;
+    position: relative; top: 3px;
+}
+
+.removeCategory:hover
+{
+    opacity: 1;
+}
+
 .loading {
     text-align:center;
     font-size: 22px;
     top: 48%;
     width:100%;
     position: absolute;
+}
+
+.addCategoryListLabel,
+.addCategoryGroupLabel
+{
+    float: left;
+    width: 80px;
+    padding-top: 10px;
+}
+
+.addCategoryGroup
+{
+    width: 450px;
+    float: left;
+    text-align: left;
+}
+.addCategorySection button.addCategory,
+.addCustomCategorySection button.addCategory
+{
+    padding: 6px 12px;
+    font-size: 15;
+}
+
+.addCustomCategorySection input
+{
+    background: transparent;
+    border: 1px solid black;
+    border-radius: 4px;
+    padding: 4px 12px;
+    margin: 0 24px;
+}
+.addCategorySection
+{
+    margin: 15px 0 ;
+    float:left;
+}
+.addCategoryGroup button.addCategory,
+ul#bookCurrentCategories li
+{
+    margin: 4px 5px;
+}
+.modal-content
+{
+    float: left;
+}
+
+ul#bookCurrentCategories
+{
+    list-style: none;
+}
+ul#bookCurrentCategories li
+{
+    border: 2px solid #ec2028;
+    border-radius: 4px;
+    padding: 3px 7px;
+    font-weight: bold;
+    vertical-align: top; display: inline-block;
+
+}
+
+
+
+
+.addCustomCategorySection
+{
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    width: 100%;
+    float:left;
+    padding: 10px 0;
+    margin-top: 14px;
+}
+
+
+.addCategories { float: left;};
+
+.categoryListing
+{
+    font-weight: bolder;
+}
+.categoryListing:after
+{
+    content: ",";
+}
+.categoryListings
+{
+    display: inline;
+}
+.categoryListings .categoryListing:last-child:after
+{
+    content: "";
+}
+
+.filterCategories-dialog .modal-content, .filterSubjects-dialog .modal-content
+{
+    float: none;
+    text-align: center;
+}
+
+
+.categoryListings span.categoryListing:first-child
+{
+    margin-left: 5px;
+
 }
