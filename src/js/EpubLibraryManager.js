@@ -30,32 +30,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         return path;
     };
 
-    //XXX mock categoryData
-    function extentMethaData(epubData) {
-        categories = ['Class 4',
-        'Class 5',
-        'Class 6',
-        'Class 7',
-        'Class 8',
-        'Form 1',
-        'Form 2',
-        'Form 3'];
-        subjects = [
-        'C.R.E',
-        'I.R.E',
-        'English',
-        'Kiswahili',
-        'Mathematics',
-        'Science',
-        'Social Studies',
-        'English Readers',
-        'Kiswahili Readers'];
-
-        var categories = _.chain(categories).sample(2).concat(_.sample(subjects, 3)).value()
-
-        epubData.categories = categories;
-    }
-
     function fetchEpubMetadata(path) {
       var deferred = $.Deferred();
       var publicationFetcher = new PublicationFetcher(path, null, window);
@@ -72,14 +46,15 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
             return {};
           })
           .then(function (doc) {
-            epubData.categories = doc.categories;
+            if (doc.categories) {
+              epubData.categories = doc.categories;
+            }
 
             if (!epubData.coverHref) {
               deferred.resolve(epubData);
               return;
             }
 
-            extentMethaData(epubData);
             var coverHref = epubData.coverHref;
             epubData.coverHref = null;
             epubData.coverLoad = function() {
