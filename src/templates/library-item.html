@@ -1,4 +1,4 @@
-<div class="col-xs-4 col-sm-3 col-md-2 library-item">
+<div class="col-xs-4 col-sm-3 col-md-2 library-item {{cssClasses}}">
     <div class='info-wrap'>
         <!-- <div class='caption book-info'>
             <h4 class='title'>{{ epub.title }}</h4>
@@ -48,7 +48,11 @@
     <div class='caption book-info'>
         <h4 class='title' title="{{epub.title}}">{{epub.title}}</h4>
         <div class='author' title="{{epub.author}}">{{epub.author}}{{^epub.author}}No Author Listed{{/epub.author}}</div>
-
+        <div class="categoryListings">
+            {{#epub.categories}}
+            <span class="categoryListing">{{.}}</span>
+            {{/epub.categories}}
+        </div>
         {{^epub.isSubLibraryLink}}
 
             {{^epub.isExternalLink}}

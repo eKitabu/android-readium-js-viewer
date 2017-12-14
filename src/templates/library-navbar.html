@@ -2,6 +2,12 @@
     <button id="aboutButt1" tabindex="1" type="button" class="btn icon-logo" title="{{strings.about}}" aria-label="{{strings.about}}"></button>
 </div>
 <div class="btn-group navbar-right">
+    <button  id="filterCategoriesButton" tabindex="1" type="button" class="btn icon-category-pick filterCategories" title="Pick Category"  data-toggle="modal" data-target=".filter-categories-dialog" style="padding-right: 0px;">
+        <span class="glyphicon glyphicon-tags" aria-hidden="true"></span>
+    </button>
+    <button  id="clearFilters" tabindex="1" type="button" class="btn" title="Clear Filters"  style="padding-left: 0px;">
+        <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
+    </button>
     <button tabindex="1" type="button" class="btn icon-thumbnails" title="{{strings.thumbnail_view}}" aria-label="{{strings.thumbnail_view}}">
         <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
     </button>
