@@ -1,4 +1,4 @@
-define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher'], function ($, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher) {
+define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher', 'pouchdb', 'papaparse', 'readium_js/epub-fetch/Utils'], function ($, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher, PouchDB, Papa, Utils) {
 
     var LibraryManager = function(){
     };
@@ -41,17 +41,24 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
             .extend({ rootUrl: path })
             .value();
 
-          if (!epubData.coverHref) {
-            deferred.resolve(epubData);
-            return;
-          }
+          new PouchDB('librarydb').get(epubData.title)
+          .catch(function () {
+            return {};
+          })
+          .then(function (doc) {
+            epubData.categories = doc.categories;
 
-          var coverHref = epubData.coverHref;
-          epubData.coverHref = null;
-          epubData.coverLoad = function() {
-            var coverDeferred = $.Deferred();
+            if (!epubData.coverHref) {
+              deferred.resolve(epubData);
+              return;
+            }
 
-            // TODO: setPackageMetadata is needed to initialize
+            var coverHref = epubData.coverHref;
+            epubData.coverHref = null;
+            epubData.coverLoad = function() {
+              var coverDeferred = $.Deferred();
+
+              // TODO: setPackageMetadata is needed to initialize
               // the EncryptionHandler -- etsakov@2017.11.24
               publicationFetcher.setPackageMetadata({ id: '' }, function() {
                 //TODO: extract image from html if needs be - jorro@2017.12.04
@@ -64,12 +71,44 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
                 });
               });
 
-            return coverDeferred.promise();
-          }
+              return coverDeferred.promise();
+            }
 
-          deferred.resolve(epubData);
+            deferred.resolve(epubData);
 
+          });
         });
+      });
+
+      return deferred.promise();
+    }
+
+    function parseIndexCSV(file) {
+      var deferred = $.Deferred();
+
+      var epubs = [];
+
+      Papa.parse(file, {
+        skipEmptyLines: true,
+        step: function (row) {
+          var data = row.data[0];
+          var title = data[0];
+          var grades = data[1].split(/\s*;\s*/);
+          var subjects = data[2].split(/\s*;\s*/);
+          var categories = grades.concat(subjects)
+
+          var epub = { _id: title, title, categories };
+
+          if (epub.title) {
+            epubs.push(epub);
+          }
+        },
+        complete: function () {
+          new PouchDB('librarydb').bulkDocs(epubs)
+          .then(function () {
+            deferred.resolve();
+          });
+        }
       });
 
       return deferred.promise();
@@ -95,7 +134,6 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
         //     this.libraryData = undefined;
         // },
 
-        // TODO: Refactor this callback abomination using promises. -- etsakov@2017.11.19
         retrieveAvailableEpubs : function(success, error){
           if (this.libraryData) {
               success(this.libraryData);
@@ -105,42 +143,66 @@ define(['jquery', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 
           var self = this;
           var libraryPath = 'file:///sdcard/eKitabu/';
 
-          function logError(err) {
+          var db = new PouchDB('librarydb');
+
+          Utils.deferize(cordova.plugins.permissions.requestPermission)
+          .call(null, cordova.plugins.permissions.READ_EXTERNAL_STORAGE)
+          .then(function (status) {
+            if (!status.hasPermission) {
+              return $.Deferred().reject('Failed to obtain READ_EXTERNAL_STORAGE permission');
+            }
+
+            return Utils.deferize(resolveLocalFileSystemURL)
+              .call(null, libraryPath);
+          })
+          .then(function (dir) {
+            var reader = dir.createReader();
+            return Utils.deferize(reader.readEntries)
+              .call(reader);
+          })
+          .then(function (entries) {
+            var csvs = _.chain(entries)
+            .filter(function(entry) {
+              return entry.name.endsWith('.csv');
+            })
+            .reduce(function (acc, entry) {
+              return acc.then(function () {
+                return Utils.deferize(entry.file)
+                  .call(entry)
+                  .then(function (file) {
+                    return parseIndexCSV(file);
+                  })
+                  .then(function () {
+                    return entry.remove();
+                  });
+              });
+            }, $.Deferred().resolve())
+            .value();
+
+            csvs.then(function () {
+              var epubPromises = _.chain(entries)
+              .filter(function(entry) {
+                return entry.name.endsWith('.epub');
+              })
+              .map(function(entry) {
+                // entry.nativeURL encodes whitespaces -- etsakov@2017.11.13
+                return fetchEpubMetadata('file://' + entry.fullPath);
+              })
+              .value();
+
+              // TODO: Load covers asynchronously. -- etsakov@2017.11.24
+              //$.when.apply($, epubPromises).then(function() {
+              //var epubs = arguments;
+              self.libraryData = epubPromises;
+              success(epubPromises);
+              //});
+            });
+          })
+          .fail(function (err) {
             console.error(err);
-            error(err);
-          }
+            error && error(err);
+          });
 
-          cordova.plugins.permissions.requestPermission(
-            cordova.plugins.permissions.READ_EXTERNAL_STORAGE,
-            function (status) {
-              if (!status.hasPermission) {
-                logError('Failed to obtain READ_EXTERNAL_STORAGE permission');
-                return;
-              }
-
-              resolveLocalFileSystemURL(libraryPath, function(dir) {
-                var reader = dir.createReader();
-                reader.readEntries(function(entries) {
-                  var epubPromises = _.chain(entries)
-                  .filter(function(entry) {
-                    return entry.name.endsWith('.epub');
-                  })
-                  .map(function(entry) {
-                    // entry.nativeURL encodes whitespaces -- etsakov@2017.11.13
-                    return fetchEpubMetadata('file://' + entry.fullPath);
-                  })
-                  .value();
-
-                  // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-                  //$.when.apply($, epubPromises).then(function() {
-                    //var epubs = arguments;
-                    self.libraryData = epubPromises;
-                    success(epubPromises);
-                  //});
-
-                }, logError);
-              }, logError);
-            }, logError);
           return;
 
             if (this.libraryData){
