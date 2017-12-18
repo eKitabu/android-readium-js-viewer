@@ -114,6 +114,9 @@ dependencies:
     "http-server": 'github:danielweck/http-server'
     # SEE: https://github.com/indexzero/http-server/issues/154
 
+    "pouchdb": "^6.3.4"
+
+    "papaparse": "^4.3.6"
 
 #####################################################################
 # These dependencies can be fetched by using the "--dev" option
@@ -168,7 +171,7 @@ devDependencies:
     # Automatically included with the CLI
     # "clean-css": 'latest'
     "clean-css-cli": 'latest'
-    
+
     "uglify-js": 'latest'
 
     #"nodeunit": 'latest'

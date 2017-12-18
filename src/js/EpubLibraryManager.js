@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher'], function ($, _, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher) {
+define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/WorkerProxy', 'StorageManager', 'i18nStrings', 'URIjs', './EpubLibraryOPDS', 'readium_js/epub-fetch/publication_fetcher', 'pouchdb', 'papaparse', 'readium_js/epub-fetch/Utils'], function ($, _, moduleConfig, PackageParser, WorkerProxy, StorageManager, Strings, URI, EpubLibraryOPDS, PublicationFetcher, PouchDB, Papa, Utils) {
 
     var LibraryManager = function(){
     };
@@ -30,32 +30,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         return path;
     };
 
-    //XXX mock categoryData
-    function extentMethaData(epubData) {
-        categories = ['Class 4',
-        'Class 5',
-        'Class 6',
-        'Class 7',
-        'Class 8',
-        'Form 1',
-        'Form 2',
-        'Form 3'];
-        subjects = [
-        'C.R.E',
-        'I.R.E',
-        'English',
-        'Kiswahili',
-        'Mathematics',
-        'Science',
-        'Social Studies',
-        'English Readers',
-        'Kiswahili Readers'];
-
-        var categories = _.chain(categories).sample(2).concat(_.sample(subjects, 3)).value()
-
-        epubData.categories = categories;
-    }
-
     function fetchEpubMetadata(path) {
       var deferred = $.Deferred();
       var publicationFetcher = new PublicationFetcher(path, null, window);
@@ -67,18 +41,26 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
             .extend({ rootUrl: path })
             .value();
 
-          extentMethaData(epubData);
-          if (!epubData.coverHref) {
-            deferred.resolve(epubData);
-            return;
-          }
+          new PouchDB('librarydb').get(epubData.title)
+          .catch(function () {
+            return {};
+          })
+          .then(function (doc) {
+            if (doc.categories) {
+              epubData.categories = doc.categories;
+            }
 
-          var coverHref = epubData.coverHref;
-          epubData.coverHref = null;
-          epubData.coverLoad = function() {
-            var coverDeferred = $.Deferred();
+            if (!epubData.coverHref) {
+              deferred.resolve(epubData);
+              return;
+            }
 
-            // TODO: setPackageMetadata is needed to initialize
+            var coverHref = epubData.coverHref;
+            epubData.coverHref = null;
+            epubData.coverLoad = function() {
+              var coverDeferred = $.Deferred();
+
+              // TODO: setPackageMetadata is needed to initialize
               // the EncryptionHandler -- etsakov@2017.11.24
               publicationFetcher.setPackageMetadata({ id: '' }, function() {
                 //TODO: extract image from html if needs be - jorro@2017.12.04
@@ -91,12 +73,44 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
                 });
               });
 
-            return coverDeferred.promise();
-          }
+              return coverDeferred.promise();
+            }
 
-          deferred.resolve(epubData);
+            deferred.resolve(epubData);
 
+          });
         });
+      });
+
+      return deferred.promise();
+    }
+
+    function parseIndexCSV(file) {
+      var deferred = $.Deferred();
+
+      var epubs = [];
+
+      Papa.parse(file, {
+        skipEmptyLines: true,
+        step: function (row) {
+          var data = row.data[0];
+          var title = data[0];
+          var grades = data[1].split(/\s*;\s*/);
+          var subjects = data[2].split(/\s*;\s*/);
+          var categories = grades.concat(subjects)
+
+          var epub = { _id: title, title, categories };
+
+          if (epub.title) {
+            epubs.push(epub);
+          }
+        },
+        complete: function () {
+          new PouchDB('librarydb').bulkDocs(epubs)
+          .then(function () {
+            deferred.resolve();
+          });
+        }
       });
 
       return deferred.promise();
@@ -122,7 +136,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         //     this.libraryData = undefined;
         // },
 
-        // TODO: Refactor this callback abomination using promises. -- etsakov@2017.11.19
         retrieveAvailableEpubs : function(success, error){
           if (this.libraryData) {
               success(this.libraryData);
@@ -132,42 +145,66 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           var self = this;
           var libraryPath = 'file:///sdcard/eKitabu/';
 
-          function logError(err) {
+          var db = new PouchDB('librarydb');
+
+          Utils.deferize(cordova.plugins.permissions.requestPermission)
+          .call(null, cordova.plugins.permissions.READ_EXTERNAL_STORAGE)
+          .then(function (status) {
+            if (!status.hasPermission) {
+              return $.Deferred().reject('Failed to obtain READ_EXTERNAL_STORAGE permission');
+            }
+
+            return Utils.deferize(resolveLocalFileSystemURL)
+              .call(null, libraryPath);
+          })
+          .then(function (dir) {
+            var reader = dir.createReader();
+            return Utils.deferize(reader.readEntries)
+              .call(reader);
+          })
+          .then(function (entries) {
+            var csvs = _.chain(entries)
+            .filter(function(entry) {
+              return entry.name.endsWith('.csv');
+            })
+            .reduce(function (acc, entry) {
+              return acc.then(function () {
+                return Utils.deferize(entry.file)
+                  .call(entry)
+                  .then(function (file) {
+                    return parseIndexCSV(file);
+                  })
+                  .then(function () {
+                    return entry.remove();
+                  });
+              });
+            }, $.Deferred().resolve())
+            .value();
+
+            csvs.then(function () {
+              var epubPromises = _.chain(entries)
+              .filter(function(entry) {
+                return entry.name.endsWith('.epub');
+              })
+              .map(function(entry) {
+                // entry.nativeURL encodes whitespaces -- etsakov@2017.11.13
+                return fetchEpubMetadata('file://' + entry.fullPath);
+              })
+              .value();
+
+              // TODO: Load covers asynchronously. -- etsakov@2017.11.24
+              //$.when.apply($, epubPromises).then(function() {
+              //var epubs = arguments;
+              self.libraryData = epubPromises;
+              success(epubPromises);
+              //});
+            });
+          })
+          .fail(function (err) {
             console.error(err);
-            error(err);
-          }
+            error && error(err);
+          });
 
-          cordova.plugins.permissions.requestPermission(
-            cordova.plugins.permissions.READ_EXTERNAL_STORAGE,
-            function (status) {
-              if (!status.hasPermission) {
-                logError('Failed to obtain READ_EXTERNAL_STORAGE permission');
-                return;
-              }
-
-              resolveLocalFileSystemURL(libraryPath, function(dir) {
-                var reader = dir.createReader();
-                reader.readEntries(function(entries) {
-                  var epubPromises = _.chain(entries)
-                  .filter(function(entry) {
-                    return entry.name.endsWith('.epub');
-                  })
-                  .map(function(entry) {
-                    // entry.nativeURL encodes whitespaces -- etsakov@2017.11.13
-                    return fetchEpubMetadata('file://' + entry.fullPath);
-                  })
-                  .value();
-
-                  // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-                  //$.when.apply($, epubPromises).then(function() {
-                    //var epubs = arguments;
-                    self.libraryData = epubPromises;
-                    success(epubPromises);
-                  //});
-
-                }, logError);
-              }, logError);
-            }, logError);
           return;
 
             if (this.libraryData){
@@ -212,7 +249,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
             } else {
                 EpubLibraryOPDS.tryParse(indexUrl, dataSuccess, dataFail);
             }
-        },        
+        },
         deleteEpubWithId : function(id, success, error){
             WorkerProxy.deleteEpub(id, this.libraryData, {
                 success: this._refreshLibraryFromWorker.bind(this, success),

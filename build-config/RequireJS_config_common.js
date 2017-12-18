@@ -87,12 +87,18 @@ require.config({
             process._RJS_rootDir(3) + '/src/js/storage/StaticStorageManager',
 
         'Analytics':
-            process._RJS_rootDir(3) + '/src/js/analytics/Analytics'
+            process._RJS_rootDir(3) + '/src/js/analytics/Analytics',
 
 
 
         // 'remotestorage':
         //     process._RJS_rootDir(3) + '/node_modules/remotestoragejs/release/head/remotestorage',
+
+        'pouchdb':
+            process._RJS_rootDir(3) + '/node_modules/pouchdb/dist/pouchdb.min',
+
+        'papaparse':
+            process._RJS_rootDir(3) + '/node_modules/papaparse/papaparse.min'
     },
 
     shim:
