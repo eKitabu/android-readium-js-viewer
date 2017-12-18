@@ -238,6 +238,13 @@ body.list-view .details{
     display:none;
 }
 
+.sorting-books{
+  display: none;
+}
+
+.sorting-books.show_element{
+    display:block;
+}
 
 .library-item button[data-link] div p {
     margin: 0;

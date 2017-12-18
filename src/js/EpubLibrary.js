@@ -363,7 +363,8 @@ Helpers){
         }
 
       Promise.all(epubs).then(function(epubsData) {
-            var sortedArray = _.sortBy(epubsData, 'title');
+            sortingProperty = $('#sortRecent.show_element').length ? 'author' : 'title';
+            var sortedArray = _.sortBy(epubsData, sortingProperty);
             _.each(sortedArray, function(epub, count) {
                 var noCoverBackground = getFakeBackground(epub, count);
                 var cssClassesString = getCategoriesCss(epub);
@@ -400,7 +401,7 @@ Helpers){
                     return next();
                 })
             },$.Deferred().resolve());
-        });        
+        });
     }
 
     var readClick = function(e){
@@ -739,6 +740,19 @@ Helpers){
             $(document.body).removeClass('list-view');
             libraryManager.retrieveAvailableEpubs(loadLibraryItemsGridView);
             setTimeout(function(){ $('.icon-list-view')[0].focus(); }, 50);
+        });
+
+        $('#sortRecent').on('click', function(){
+            $('.sorting-books').toggleClass('show_element');
+            $('#app-container .library-items').remove();
+            libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+            setTimeout(function(){ $('#sortAlphabetic')[0].focus(); }, 50);
+        });
+        $('#sortAlphabetic').on('click', function(){
+            $('.sorting-books').toggleClass('show_element');
+            $('#app-container .library-items').remove();
+            libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+            setTimeout(function(){ $('#sortRecent')[0].focus(); }, 50);
         });
 
         $("#clearFilters").click(function() {

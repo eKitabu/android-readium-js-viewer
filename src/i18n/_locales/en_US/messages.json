@@ -18,6 +18,12 @@
   "thumbnail_view" : {
     "message" : "Thumbnail View"
   },
+  "sort_books_by_recent_view": {
+      "message": "Sort the books by the time of last reading"
+  },
+  "sort_books_by_title_view": {
+      "message": "Sort the books alphabetically"
+  },
   "view_library": {
     "message" : "Library"
   },
