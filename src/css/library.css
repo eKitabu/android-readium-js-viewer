@@ -226,6 +226,12 @@ body.list-view .details{
   background-image: url('../images/glyphicons_158_show_lines.png');
 }*/
 
+.btn-svg img {
+  width:18px;
+  height: 18px;
+  vertical-align: top;
+}
+
 .icon-thumbnails{
     display:none;
 }
