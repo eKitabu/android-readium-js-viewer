@@ -137,8 +137,8 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         // },
 
         retrieveAvailableEpubs : function(success, error){
-          if (this.epubs) {
-              success(this.epubs);
+          if (this.libraryData) {
+              success(this.libraryData);
               return;
           }
 
@@ -192,11 +192,10 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
               })
               .value();
 
-
-              $.when.apply($, epubPromises).then(function() {                
-                self.epubs = arguments;
-                self.libraryData = epubPromises;
-                success(self.epubs);
+              $.when.apply($, epubPromises).then(function() {
+                var epubs = arguments;
+                self.libraryData = epubs;
+                success(epubs);
               });
             });
           })
