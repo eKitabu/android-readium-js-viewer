@@ -218,7 +218,7 @@ html[data-theme=night-theme] .page-switch-overlay-icon {
 
 .page-switch-overlay-icon > span
 {
-    padding: 0;
+    padding: 4px;
     margin: 0;
 
 vertical-align: middle;

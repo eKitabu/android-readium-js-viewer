@@ -48,7 +48,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           .then(function (doc) {
             if (doc.categories) {
               epubData.categories = doc.categories;
-              console.error('epubData.categories:', epubData.categories);
             }
 
             if (!epubData.coverHref) {
@@ -196,6 +195,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
 
               $.when.apply($, epubPromises).then(function() {                
                 self.epubs = arguments;
+                self.libraryData = epubPromises;
                 success(self.epubs);
               });
             });
