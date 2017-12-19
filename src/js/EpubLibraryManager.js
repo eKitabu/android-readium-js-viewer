@@ -48,6 +48,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           .then(function (doc) {
             if (doc.categories) {
               epubData.categories = doc.categories;
+              console.error('epubData.categories:', epubData.categories);
             }
 
             if (!epubData.coverHref) {
@@ -137,8 +138,8 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         // },
 
         retrieveAvailableEpubs : function(success, error){
-          if (this.libraryData) {
-              success(this.libraryData);
+          if (this.epubs) {
+              success(this.epubs);
               return;
           }
 
@@ -192,12 +193,11 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
               })
               .value();
 
-              // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-              //$.when.apply($, epubPromises).then(function() {
-              //var epubs = arguments;
-              self.libraryData = epubPromises;
-              success(epubPromises);
-              //});
+
+              $.when.apply($, epubPromises).then(function() {                
+                self.epubs = arguments;
+                success(self.epubs);
+              });
             });
           })
           .fail(function (err) {

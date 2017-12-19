@@ -362,49 +362,48 @@ Helpers){
           return noCoverBackground;
         }
 
-      Promise.all(epubs).then(function(epubsData) {
-            sortingProperty = $('#sortRecent.show_element').length ? 'author' : 'title';
-            var sortedArray = _.sortBy(epubsData, sortingProperty);
-            _.each(sortedArray, function(epub, count) {
-                var noCoverBackground = getFakeBackground(epub, count);
-                var cssClassesString = getCategoriesCss(epub);
-                var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
-                $('.library-items').append(libItem);
-                var needToHideLibraryItem = currentCssFilterString !== "" &&
-                  currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length;
+        sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'author';
+        var sortedArray = _.sortBy(epubs, sortingProperty);
+        _.each(sortedArray, function(epub, count) {
+            var noCoverBackground = getFakeBackground(epub, count);
+            var cssClassesString = getCategoriesCss(epub);
+            var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
+            $('.library-items').append(libItem);
+            var needToHideLibraryItem = currentCssFilterString !== "" &&
+              currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length;
 
-                if (needToHideLibraryItem) {
-                  libItem.hide();
-                } else {
-                  libItem.show();
-                }
+            if (needToHideLibraryItem) {
+              libItem.hide();
+            } else {
+              libItem.show();
+            }
 
-                if (!epub.coverLoad || epub.coverHref) {
+            if (!epub.coverLoad || epub.coverHref) {
+              return true;
+            }
+            coverPromises.push(function() {
+                if (!epub.coverLoad) {
                   return true;
                 }
-                coverPromises.push(function() {
-                    if (!epub.coverLoad) {
-                      return true;
-                    }
-                    return epub.coverLoad().then(function(epubData) {
-                        var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
-                        $('.library-items').find(libItem).replaceWith(newLibItem);
-                        (currentCssFilterString !== "" &&
-                            currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length) ?
-                            newLibItem.hide() :
-                            newLibItem.show();
+                return epub.coverLoad().then(function(epubData) {
+                    var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
+                    $('.library-items').find(libItem).replaceWith(newLibItem);
+                    (currentCssFilterString !== "" &&
+                        currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length) ?
+                        newLibItem.hide() :
+                        newLibItem.show();
 
-                        epub.coverLoad = null;
-                    });
+                    epub.coverLoad = null;
                 });
             });
-
-           coverPromises.reduce(function(promise,next){
-                return promise.then(function(){
-                    return next();
-                })
-            },$.Deferred().resolve());
         });
+
+       coverPromises.reduce(function(promise,next){
+            return promise.then(function(){
+                return next();
+            })
+        },$.Deferred().resolve());
+
     }
 
     var readClick = function(e){
@@ -733,29 +732,30 @@ Helpers){
         $('.add-book').on('click', handleUrlSelect);
         $('nav').empty();
         $('nav').attr("aria-label", Strings.i18n_toolbar);
-        $('nav').append(LibraryNavbar({strings: Strings, dialogs: Dialogs, keyboard: Keyboard}));
+        $('nav').append(LibraryNavbar({strings: Strings, dialogs: Dialogs, keyboard: Keyboard}));        
+
         $('.icon-list-view').on('click', function(){
             $(document.body).addClass('list-view');
             libraryManager.retrieveAvailableEpubs(loadLibraryItemsListView);
-            setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);
+            setTimeout(function(){ $('.icon-thumbnails').focus(); }, 50);
         });
         $('.icon-thumbnails').on('click', function(){
             $(document.body).removeClass('list-view');
             libraryManager.retrieveAvailableEpubs(loadLibraryItemsGridView);
-            setTimeout(function(){ $('.icon-list-view')[0].focus(); }, 50);
+            setTimeout(function(){ $('.icon-list-view').focus(); }, 50);
         });
 
         $('#sortRecent').on('click', function(){
             $('.sorting-books').toggleClass('show_element');
             $('#app-container .library-items').remove();
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
-            setTimeout(function(){ $('#sortAlphabetic')[0].focus(); }, 50);
+            setTimeout(function(){ $('#sortAlphabetic').focus(); }, 50);
         });
         $('#sortAlphabetic').on('click', function(){
             $('.sorting-books').toggleClass('show_element');
             $('#app-container .library-items').remove();
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
-            setTimeout(function(){ $('#sortRecent')[0].focus(); }, 50);
+            setTimeout(function(){ $('#sortRecent').focus(); }, 50);
         });
 
         $("#clearFilters").click(function() {
