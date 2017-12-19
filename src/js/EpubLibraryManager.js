@@ -192,12 +192,11 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
               })
               .value();
 
-              // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-              //$.when.apply($, epubPromises).then(function() {
-              //var epubs = arguments;
-              self.libraryData = epubPromises;
-              success(epubPromises);
-              //});
+              $.when.apply($, epubPromises).then(function() {
+                var epubs = arguments;
+                self.libraryData = epubs;
+                success(epubs);
+              });
             });
           })
           .fail(function (err) {

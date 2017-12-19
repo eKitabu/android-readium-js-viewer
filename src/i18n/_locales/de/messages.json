@@ -10,6 +10,12 @@
     "thumbnail_view": {
         "message": "Kachelansicht"
     },
+    "sort_books_by_recent_view": {
+        "message": "Sortiere die Bücher nach der Zeit von letzte Lesung"
+    },
+    "sort_books_by_title_view": {
+        "message": "Sortieren Sie die Bücher alphabetisch"
+    },
     "view_library": {
         "message": "Bibliothek"
     },

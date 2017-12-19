@@ -190,7 +190,7 @@ Helpers){
         showDialog("filterCategories");
         $('.filterCategories-dialog .modal-body').html(bodyStr);
         FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog);
-    };  
+    };
 
     var showDetailsDialog = function(details){
         var bodyStr = DetailsBody({
@@ -341,136 +341,69 @@ Helpers){
             $(currentCssFilterString).show();
         }
 
-        var count = 0;
-        epubs.forEach(function(epubPromise) {
-            epubPromise.then(function(epub){
-                var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
-                if (epub.isSubLibraryLink) {
-                    noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
+        function getCategoriesCss(epub) {
+          var cssClassesString = "";
+          if (epub.hasOwnProperty("categories")) {
+              var cssArray = _.map(epub.categories, (category) => {
+                  var itemClass = category.replace(/ /g, "_").replace(/\./g, "");
+                  return `category-${itemClass}`;
+              });
+
+              cssClassesString = cssArray.join(" ");
+          }
+          return cssClassesString;
+        }
+
+      function getFakeBackground(epub, count) {
+          var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
+          if (epub.isSubLibraryLink) {
+              noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
+          }
+          return noCoverBackground;
+        }
+
+        sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'author';
+        var sortedArray = _.sortBy(epubs, sortingProperty);
+        _.each(sortedArray, function(epub, count) {
+            var noCoverBackground = getFakeBackground(epub, count);
+            var cssClassesString = getCategoriesCss(epub);
+            var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
+            $('.library-items').append(libItem);
+            var needToHideLibraryItem = currentCssFilterString !== "" &&
+              currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length;
+
+            if (needToHideLibraryItem) {
+              libItem.hide();
+            } else {
+              libItem.show();
+            }
+
+            if (!epub.coverLoad || epub.coverHref) {
+              return true;
+            }
+            coverPromises.push(function() {
+                if (!epub.coverLoad) {
+                  return true;
                 }
+                return epub.coverLoad().then(function(epubData) {
+                    var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
+                    $('.library-items').find(libItem).replaceWith(newLibItem);
+                    (currentCssFilterString !== "" &&
+                        currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length) ?
+                        newLibItem.hide() :
+                        newLibItem.show();
 
-                cssClassesString = "";
-                var needToHideLibraryItem = false;
-                if (epub.hasOwnProperty("categories")) {
-                    cssArray = epub.categories.slice();
-                    epub.categories.forEach(prepareCssClassStrings);
-                    function prepareCssClassStrings(item,index){
-                        var categoryPrepend = "category-";
-                        item = item.replace(/ /g, "_");
-                        item = categoryPrepend.concat(item.replace(/\./g, ""));
-                        cssArray[index] = item;
-                    }
-                    var cssClassesString = cssArray.join(" ");
-                }
-
-                needToHideLibraryItem =
-                    (currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length) &&
-                    currentCssFilterString !== "";
-
-                var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
-                if (needToHideLibraryItem) {
-                  libItem.hide();
-                }
-                $('.library-items').append(libItem);
-
-                if (epub.coverLoad) {
-                    coverPromises.push(function(){
-                        return epub.coverLoad().then(function(epubData) {
-                            var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
-
-                            $('.library-items').find(libItem).replaceWith(newLibItem);
-                            if (needToHideLibraryItem) {
-                              newLibItem.hide();
-                            }
-                            epub.coverLoad = null;
-                        });
-                    })
-
-                }
-
-                count++;
-
-                if (count == epubs.length-1) {
-                    coverPromises.reduce(function(promise,next){
-                        return promise.then(function(){
-                            return next();
-                        })
-                    },$.Deferred().resolve());
-                }
-            })
+                    epub.coverLoad = null;
+                });
+            });
         });
 
+       coverPromises.reduce(function(promise,next){
+            return promise.then(function(){
+                return next();
+            })
+        },$.Deferred().resolve());
 
-        // coverPromises.reduce(function(promise,next){
-        //     return promise.then(function(){
-        //         return next();
-        //     })
-        // },$.Deferred().resolve());
-
-        // var processEpub = function(epubs, count) {
-        //     var epub = epubs[count];
-        //     if (!epub) { // count >= epubs.length
-        //         $('.details').on('click', loadDetails);
-        //         return;
-        //     }
-
-        //     var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
-        //     if (epub.isSubLibraryLink) {
-        //         noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
-        //     }
-
-        //     var createLibraryItem = function() {
-
-        //         // See --COMMENT-- below!
-        //         // if (!epub.isSubLibraryLink && !epub.packagePath) {
-        //         //     console.warn("no epub.packagePath (OPF within zipped EPUB archive?): " + epub.rootUrl);
-        //         //     //console.log(epub);
-        //         // }
-
-        //         //$('.library-items').append(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-
-        //         var libItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epub, strings: Strings, noCoverBackground: noCoverBackground}));
-        //         $('.library-items').append(libItem);
-
-        //         if (epub.coverLoad) {
-        //             coverPromises.push(function(){
-        //                 return epubData.coverLoad().then(function(epubData) {
-        //                     var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground}));
-        //                     $('.library-items').find(libItem).replaceWith(newLibItem);
-        //                 });
-        //             })
-        //         }
-
-        //         processEpub(epubs, ++count);
-        //     };
-
-        //     if (!epub.isSubLibraryLink && !epub.packagePath) {
-
-        //         createLibraryItem();
-
-        //         // --COMMENT--
-        //         // Code below works, but just here to demonstrate how the package OPF path can be resolved whilst populating the library view. Because the HTTP requests for each ebook introduce huge lag, instead we resolve the OPF path on-demand, when user chooses to see the EPUB details / metadata dialog popup (see loadDetails() function above, which itself emits an HTTP request to get the actual OPF file XML payload, via LibraryManager.retrieveFullEpubDetails())
-        //         // $.get(epub.rootUrl + "/META-INF/container.xml", function(data){
-
-        //         //     if(typeof(data) === "string" ) {
-        //         //         var parser = new window.DOMParser;
-        //         //         data = parser.parseFromString(data, 'text/xml');
-        //         //     }
-        //         //     var $rootfile = $('rootfile', data);
-        //         //     epub.packagePath = $rootfile.attr('full-path');
-
-        //         //     createLibraryItem();
-
-        //         // }).fail(function() {
-        //         //     //console.warn(arguments);
-        //         //     createLibraryItem();
-        //         // });
-        //     }
-        //     else {
-        //         createLibraryItem();
-        //     }
-        // };
-        // processEpub(epubs, 0);
     }
 
     var readClick = function(e){
@@ -799,16 +732,30 @@ Helpers){
         $('.add-book').on('click', handleUrlSelect);
         $('nav').empty();
         $('nav').attr("aria-label", Strings.i18n_toolbar);
-        $('nav').append(LibraryNavbar({strings: Strings, dialogs: Dialogs, keyboard: Keyboard}));
+        $('nav').append(LibraryNavbar({strings: Strings, dialogs: Dialogs, keyboard: Keyboard}));        
+
         $('.icon-list-view').on('click', function(){
             $(document.body).addClass('list-view');
             libraryManager.retrieveAvailableEpubs(loadLibraryItemsListView);
-            setTimeout(function(){ $('.icon-thumbnails')[0].focus(); }, 50);
+            setTimeout(function(){ $('.icon-thumbnails').focus(); }, 50);
         });
         $('.icon-thumbnails').on('click', function(){
             $(document.body).removeClass('list-view');
             libraryManager.retrieveAvailableEpubs(loadLibraryItemsGridView);
-            setTimeout(function(){ $('.icon-list-view')[0].focus(); }, 50);
+            setTimeout(function(){ $('.icon-list-view').focus(); }, 50);
+        });
+
+        $('#sortRecent').on('click', function(){
+            $('.sorting-books').toggleClass('show_element');
+            $('#app-container .library-items').remove();
+            libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+            setTimeout(function(){ $('#sortAlphabetic').focus(); }, 50);
+        });
+        $('#sortAlphabetic').on('click', function(){
+            $('.sorting-books').toggleClass('show_element');
+            $('#app-container .library-items').remove();
+            libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+            setTimeout(function(){ $('#sortRecent').focus(); }, 50);
         });
 
         $("#clearFilters").click(function() {

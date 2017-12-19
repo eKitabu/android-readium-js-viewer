@@ -14,4 +14,5 @@ http.log
 http_ebooks.log
 http_app.log
 http_app-ebooks.log
-
+android-release-keys.properties
+keys.p12

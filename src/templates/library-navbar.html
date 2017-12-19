@@ -3,13 +3,19 @@
 </div>
 <div class="btn-group navbar-right">
     <button  id="filterCategoriesButton" tabindex="1" type="button" class="btn icon-category-pick filterCategories" title="Pick Category"  data-toggle="modal" data-target=".filter-categories-dialog" style="padding-right: 0px;">
-        <span class="glyphicon glyphicon-tags" aria-hidden="true"></span>
+        <span class="glyphicon glyphicon-filter" aria-hidden="true"></span>
     </button>
     <button  id="clearFilters" tabindex="1" type="button" class="btn" title="Clear Filters"  style="padding-left: 0px;">
         <span class="glyphicon glyphicon-ban-circle" aria-hidden="true"></span>
     </button>
-    <button tabindex="1" type="button" class="btn icon-thumbnails" title="{{strings.thumbnail_view}}" aria-label="{{strings.thumbnail_view}}">
-        <span class="glyphicon glyphicon-th" aria-hidden="true"></span>
+    <button  id="sortRecent" tabindex="1" type="button" class="btn sorting-books show_element" title="{{strings.sort_books_by_recent_view}}"  style="padding-left: 0px;" aria-label="{{strings.sort_books_by_recent_view}}">
+        <span class="glyphicon glyphicon glyphicon-sort-by-attributes" aria-hidden="true"></span>
+    </button>
+    <button  id="sortAlphabetic" tabindex="1" type="button" class="btn sorting-books" title="{{strings.sort_books_by_title_view}}"  style="padding-left: 0px;" aria-label="{{strings.sort_books_by_title_view}}">
+        <span class="glyphicon glyphicon glyphicon-sort-by-alphabet" aria-hidden="true"></span>
+    </button>
+    <button tabindex="1" type="button" class="btn btn-svg icon-thumbnails" title="{{strings.thumbnail_view}}" aria-label="{{strings.thumbnail_view}}">
+        <img src="{{{imagePathPrefix}}}images/bookshelf.svg" alt="">
     </button>
     <button tabindex="1" type="button" class="btn icon-list-view" title="{{strings.list_view}}" aria-label="{{strings.list_view}}">
         <span class="glyphicon glyphicon-align-justify" aria-hidden="true"></span>
