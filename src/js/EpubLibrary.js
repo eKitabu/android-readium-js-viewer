@@ -373,16 +373,19 @@ Helpers){
                 var needToHideLibraryItem = currentCssFilterString !== "" &&
                   currentSelectedCategories.length !== _.intersection(currentSelectedCategories, epub.categories).length;
 
-              if (needToHideLibraryItem) {
+                if (needToHideLibraryItem) {
                   libItem.hide();
                 } else {
                   libItem.show();
                 }
 
-               if (!epub.coverLoad || epub.coverHref) {
+                if (!epub.coverLoad || epub.coverHref) {
                   return true;
                 }
                 coverPromises.push(function() {
+                    if (!epub.coverLoad) {
+                      return true;
+                    }
                     return epub.coverLoad().then(function(epubData) {
                         var newLibItem = $(LibraryItem({count:{n: count+1, tabindex:count*2+99}, epub: epubData, strings: Strings, noCoverBackground: noCoverBackground, cssClasses:cssClassesString}));
                         $('.library-items').find(libItem).replaceWith(newLibItem);
