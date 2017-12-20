@@ -15,6 +15,12 @@
     "thumbnail_view" : {
         "message" : "Vista en miniaturas"
     },
+    "sort_books_by_recent_view": {
+        "message": "Ordena los libros después de la última lectura"
+    },
+    "sort_books_by_title_view": {
+        "message": "Ordena los libros alfabéticamente"
+    },
     "view_library": {
         "message" : "Biblioteca"
     },

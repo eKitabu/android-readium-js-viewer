@@ -3,6 +3,9 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
     var LibraryManager = function(){
     };
 
+    var libraryDB = new PouchDB('librarydb');
+    var categoryIndexDB = new PouchDB('categorydb');
+
     var adjustEpubLibraryPath = function(path) {
 
         if (!path || !moduleConfig.epubLibraryPath) return path;
@@ -30,62 +33,100 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         return path;
     };
 
-    function fetchEpubMetadata(path) {
-      var deferred = $.Deferred();
-      var publicationFetcher = new PublicationFetcher(path, null, window);
-
-      publicationFetcher.initialize(function() {
-        publicationFetcher.getPackageDom(function(packageDom) {
-          var epubData = _.chain(PackageParser.parsePackageDom(packageDom))
-            .pick('author', 'title', 'coverHref')
-            .extend({ rootUrl: path })
-            .value();
-
-          new PouchDB('librarydb').get(epubData.title)
-          .catch(function () {
-            return {};
-          })
-          .then(function (doc) {
-            if (doc.categories) {
-              epubData.categories = doc.categories;
-            }
-
-            if (!epubData.coverHref) {
-              deferred.resolve(epubData);
-              return;
-            }
-
-            var coverHref = epubData.coverHref;
-            epubData.coverHref = null;
-            epubData.coverLoad = function() {
-              var coverDeferred = $.Deferred();
-
-              // TODO: setPackageMetadata is needed to initialize
-              // the EncryptionHandler -- etsakov@2017.11.24
-              publicationFetcher.setPackageMetadata({ id: '' }, function() {
-                //TODO: extract image from html if needs be - jorro@2017.12.04
-                publicationFetcher.relativeToPackageFetchFileContents(coverHref, 'blob', function(imageBlob) {
-                  epubData.coverHref = window.URL.createObjectURL(imageBlob);
-                  coverDeferred.resolve(epubData);
-                }, function(err) {
-                  console.error(err);
-                  coverDeferred.resolve(epubData);
-                });
-              });
-
-              return coverDeferred.promise();
-            }
-
-            deferred.resolve(epubData);
-
-          });
-        });
+    function fetchEpubMetadataDB(path) {
+      var promise = libraryDB.allDocs({include_docs: true})
+      .then(function (result) {
+        return _.map(result.rows, 'doc');
+      })
+      .then(function (docs) {
+        return _.find(docs, { rootUrl: path });
       });
 
-      return deferred.promise();
+      return Utils.deferizePromise(promise);
     }
 
-    function parseIndexCSV(file) {
+    function fetchEpubMetadataFS(path) {
+      var publicationFetcher = new PublicationFetcher(path, null, window);
+
+      return Utils.deferize(publicationFetcher.initialize).call(publicationFetcher)
+      .then(function () {
+        return Utils.deferize(publicationFetcher.getPackageDom).call(publicationFetcher);
+      })
+      .then(function (packageDom) {
+        return _.chain(PackageParser.parsePackageDom(packageDom))
+          .pick('author', 'title', 'coverHref')
+          .extend({ rootUrl: path })
+          .value();
+      });
+    }
+
+    function persistEpubMetadata(epubData) {
+      epubData._id = epubData.title;
+
+      var promise = libraryDB.get(epubData._id)
+      .catch(function () {
+        return {};
+      })
+      .then(function (doc) {
+        _.extendOwn(epubData, _.pick(doc, '_rev', 'categories'));
+
+        return libraryDB.put(epubData);
+      })
+      .catch(function () {
+        return {};
+      })
+      .then(function () {
+        return epubData;
+      });
+
+      return Utils.deferizePromise(promise);
+    }
+
+    function fetchEpubMetadata(path) {
+      return fetchEpubMetadataDB(path)
+      .then(function (epub) {
+        if (!epub) {
+          return fetchEpubMetadataFS(path)
+          .then(function (epubData) {
+            return persistEpubMetadata(epubData);
+          });
+        }
+
+        return epub;
+      })
+      .then(function (epub) {
+        if (!epub.coverHref) {
+          return epub;
+        }
+
+        var coverHref = epub.coverHref;
+        epub.coverHref = null;
+
+        epub.coverLoad = function () {
+          var publicationFetcher = new PublicationFetcher(path, null, window);
+          return Utils.deferize(publicationFetcher.initialize).call(publicationFetcher)
+          .then(function () {
+            // TODO: setPackageMetadata is needed to initialize
+            // the EncryptionHandler -- etsakov@2017.11.24
+            return Utils.deferize(publicationFetcher.setPackageMetadata)
+            .call(publicationFetcher, { id: '' });
+          })
+          .then(function () {
+            //TODO: extract image from html if needs be - jorro@2017.12.04
+            return Utils.deferize(publicationFetcher.relativeToPackageFetchFileContents)
+            .call(publicationFetcher, coverHref, 'blob');
+          })
+          .then(function (imageBlob) {
+            epub.coverHref = window.URL.createObjectURL(imageBlob);
+            return epub;
+          });
+        };
+
+        return epub;
+      });
+    }
+
+    function digestIndexCSV(file) {
       var deferred = $.Deferred();
 
       var epubs = [];
@@ -106,7 +147,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           }
         },
         complete: function () {
-          new PouchDB('librarydb').bulkDocs(epubs)
+          libraryDB.bulkDocs(epubs)
           .then(function () {
             deferred.resolve();
           });
@@ -114,6 +155,36 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
       });
 
       return deferred.promise();
+    }
+
+    function buildCategoryIndex(entries) {
+      var promise = categoryIndexDB.allDocs({include_docs: true})
+      .then(function (result) {
+        return _.map(result.rows, 'doc');
+      })
+      .then(function (docs) {
+        return _.reject(entries, function (entry) {
+          return _.some(docs, function (doc) {
+            return doc._id === entry.name;
+          });
+        });
+      });
+
+      return Utils.deferizePromise(promise)
+      .then(function (entries) {
+        return _.reduce(entries, function (acc, entry) {
+          return acc.then(function () {
+            return Utils.deferize(entry.file)
+              .call(entry)
+              .then(function (file) {
+                return digestIndexCSV(file);
+              })
+              .then(function () {
+                return Utils.deferizePromise(categoryIndexDB.put({ _id: entry.name }));
+              });
+          });
+        }, $.Deferred().resolve())
+      });
     }
 
     LibraryManager.prototype = {
@@ -145,8 +216,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           var self = this;
           var libraryPath = 'file:///sdcard/eKitabu/';
 
-          var db = new PouchDB('librarydb');
-
           Utils.deferize(cordova.plugins.permissions.requestPermission)
           .call(null, cordova.plugins.permissions.READ_EXTERNAL_STORAGE)
           .then(function (status) {
@@ -163,25 +232,11 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
               .call(reader);
           })
           .then(function (entries) {
-            var csvs = _.chain(entries)
-            .filter(function(entry) {
+            var csvs = _.filter(entries, function (entry) {
               return entry.name.endsWith('.csv');
-            })
-            .reduce(function (acc, entry) {
-              return acc.then(function () {
-                return Utils.deferize(entry.file)
-                  .call(entry)
-                  .then(function (file) {
-                    return parseIndexCSV(file);
-                  })
-                  .then(function () {
-                    return entry.remove();
-                  });
-              });
-            }, $.Deferred().resolve())
-            .value();
+            });
 
-            csvs.then(function () {
+            buildCategoryIndex(csvs).then(function () {
               var epubPromises = _.chain(entries)
               .filter(function(entry) {
                 return entry.name.endsWith('.epub');
@@ -192,12 +247,11 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
               })
               .value();
 
-              // TODO: Load covers asynchronously. -- etsakov@2017.11.24
-              //$.when.apply($, epubPromises).then(function() {
-              //var epubs = arguments;
-              self.libraryData = epubPromises;
-              success(epubPromises);
-              //});
+              $.when.apply($, epubPromises).then(function() {
+                var epubs = arguments;
+                self.libraryData = epubs;
+                success(epubs);
+              });
             });
           })
           .fail(function (err) {
