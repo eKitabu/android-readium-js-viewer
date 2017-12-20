@@ -108,7 +108,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var epub = eventPayload.epub;
         if (epub && (typeof epub !== "string")) {
             epub = ebookURL_filepath;
-        }
+        }        
 
         ebookURL_filepath = EpubReader.ensureUrlIsRelativeToApp(ebookURL_filepath);
 

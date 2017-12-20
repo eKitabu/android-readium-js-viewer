@@ -29,7 +29,10 @@ define([
 'Analytics',
 './Keyboard',
 './versioning/ReadiumVersioning',
-'readium_shared_js/helpers'],
+'readium_shared_js/helpers',
+'./pouchDBHelper',
+'readium_js/epub-fetch/Utils',
+'pouchdb'],
 
 function(
 moduleConfig,
@@ -62,7 +65,10 @@ Messages,
 Analytics,
 Keyboard,
 Versioning,
-Helpers){
+Helpers,
+PouchDBHelper,
+Utils,
+PouchDB){
 
     var pageDialogsHtmlString = {
       details             : Dialog({ dialogName: "details"            }),
@@ -80,6 +86,8 @@ Helpers){
     var heightRule,
         noCoverRule;
         //maxHeightRule
+
+    var pouch = new PouchDBHelper.getPouch('librarydb');
 
     var spin = function(on)
     {
@@ -414,8 +422,25 @@ Helpers){
 
         var ebookURL = $(this).attr('data-book');
         if (ebookURL) {
+
             var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
-            $(window).triggerHandler('readepub', eventPayload);
+            var epubTitle = eventPayload.epub.replace(/\\/g,'/').replace(/.*\//, '').split('.')[0]; //XXX Path.basename(ebookURL);
+            pouch.get('A sack of money')
+            .then(function (epubData) {
+              _.extendOwn(epubData, {lastRead: Date.now()});
+
+              return pouch.save(epubData);
+            })
+            .then(function (epubData) {
+              console.log('updated epubData: ', epubData);
+              return epubData;
+            })
+            .then(function (a){
+              $(window).triggerHandler('readepub', eventPayload);
+            }, function(err) {
+              console.error('errrr', err);
+            });
+
         }
         else {
             var libURL = $(this).attr('data-library');
