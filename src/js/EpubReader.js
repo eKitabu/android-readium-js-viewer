@@ -134,24 +134,24 @@ BookmarkData){
         //connect to the remote sync version of the database
         app_login.get("credentials").then(function(credentials)
         {
-            // var loginUrl = 'http://' +
-            //         externalDb.url + ':' +
-            //         externalDb.port + '/'+
-            //         credentials.user;
-            // var remote_app_log_db = new PouchDB(loginUrl, {
-            //     auth: {
-            //         username: credentials.user,
-            //         password: credentials.password
-            //       }
-            // });
-            // //the "then" will fire if we have a remote database connection
-            // remote_app_log_db.info()
-            // .then(function (details) {
-            //     //push the most recent changes to the remote database
-            //     app_log_db.replicate.to(remote_app_log_db);
-            // }).catch(function (err) {
-            //     console.log("Error trying to replicate usage data: " + err);
-            // });
+            var loginUrl = 'http://' +
+                    externalDb.url + ':' +
+                    externalDb.port + '/'+
+                    credentials.user;
+            var remote_app_log_db = new PouchDB(loginUrl, {
+                auth: {
+                    username: credentials.user,
+                    password: credentials.password
+                  }
+            });
+            //the "then" will fire if we have a remote database connection
+            remote_app_log_db.info()
+            .then(function (details) {
+                //push the most recent changes to the remote database
+                app_log_db.replicate.to(remote_app_log_db);
+            }).catch(function (err) {
+                console.log("Error trying to replicate usage data: " + err);
+            });
         }).catch(function(err) {
             if (err.status === 404) {
                 return app_login.put(credentials);

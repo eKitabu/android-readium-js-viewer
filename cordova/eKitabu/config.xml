@@ -11,6 +11,11 @@
     <allow-intent href="sms:*"/>
     <allow-intent href="mailto:*"/>
     <allow-intent href="geo:*"/>
+
+    <allow-navigation href="*"/>
+    
+
+
     <platform name="android">
         <allow-intent href="market:*"/>
     <icon src="www/icons/large.png"/><icon src="www/icons/small.png" width="16"/><icon src="www/icons/medium.png" width="48"/><icon src="www/icons/large.png" width="128"/></platform>
