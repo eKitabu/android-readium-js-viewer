@@ -210,20 +210,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         retrieveAvailableEpubs : function(success, error){
           var self = this;
           if (self.libraryData) {
-              var promise = libraryDB.allDocs({include_docs: true})
-              .then(function (result) {
-                  var dbEpubs = _.map(result.rows, 'doc');
-                  _.each(self.libraryData, function(epub) {
-                    var dbEpub = _.find(dbEpubs, function(dbEpub) {
-                        return dbEpub.title === epub.title;
-                      });
-                      if(dbEpub) {
-                        epub.lastReadTime = dbEpub.lastReadTime;
-                      }
-                  });
-                  return success(self.libraryData)
-              });
-              return;
+              return success(self.libraryData);
           }
 
           var self = this;

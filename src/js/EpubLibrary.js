@@ -69,7 +69,7 @@ Helpers,
 PouchDBHelper,
 Utils,
 PouchDB){
-
+    var self = this;
     var pageDialogsHtmlString = {
       details             : Dialog({ dialogName: "details"            }),
       filterCategories    : Dialog({ dialogName: "filterCategories"   }),
@@ -313,6 +313,8 @@ PouchDB){
     }
 
     var loadLibraryItems = function(epubs, viewType){
+        self.epubs = epubs;
+
         $('#app-container .library-items').remove();
         //$('#app-container').append(LibraryBody({}));
         //if the view type isn't specified, check if we have the list-view class
@@ -373,8 +375,8 @@ PouchDB){
         //sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'lastReadTime';
         var sortedArray = $('#sortRecent.show_element').length ?
           _.sortBy(epubs, 'title') :
-          _.sortBy(epubs, function(epub) {
-              return epub.lastReadTime ? -epub.lastReadTime : -1;
+          _.sortBy(epubs, function(epub) {// filter in decreasing order
+              return epub.lastReadTime ? -epub.lastReadTime : 0; //if no lastReadTime set to 0
           });
 
         _.each(sortedArray, function(epub, count) {
@@ -429,21 +431,24 @@ PouchDB){
         if (ebookURL) {
 
             var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
-            //var epubTitle = eventPayload.epub.replace(/\\/g,'/').replace(/.*\//, '').split('.')[0]; //XXX Path.basename(ebookURL);
-            pouch.get($(this).attr('data-title') || 'A sack of money')
+
+            pouch.get($(this).attr('data-title'))
             .then(function (epubData) {
               _.extendOwn(epubData, {lastReadTime: Date.now()});
 
-              return pouch.save(epubData);
-            })
-            .then(function (epubData) {
-              console.log('updated epubData: ', epubData);
-              return epubData;
+              return pouch.save(epubData).then(function(){//savedEpub has only id and status
+                  var newEpubData = _.find(self.epubs, function(epub) {
+                      return epub._id === epubData._id;
+                  });
+                  if(newEpubData) {
+                      newEpubData.lastReadTime = epubData.lastReadTime;
+                  }
+              });
             })
             .then(function (a){
-              $(window).triggerHandler('readepub', eventPayload);
+                $(window).triggerHandler('readepub', eventPayload);
             }, function(err) {
-              console.error('errrr', err);
+                console.error('problem with saving lastReadStatus', err);
             });
 
         }
