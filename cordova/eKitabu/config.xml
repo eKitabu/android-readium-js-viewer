@@ -13,8 +13,6 @@
     <allow-intent href="geo:*"/>
 
     <allow-navigation href="*"/>
-    
-
 
     <platform name="android">
         <allow-intent href="market:*"/>
