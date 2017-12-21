@@ -208,9 +208,9 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         // },
 
         retrieveAvailableEpubs : function(success, error){
-          if (this.libraryData) {
-              success(this.libraryData);
-              return;
+          var self = this;
+          if (self.libraryData) {
+              return success(self.libraryData);
           }
 
           var self = this;
