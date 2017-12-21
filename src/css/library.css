@@ -23,8 +23,8 @@
 }
 .library-item{
     position: relative;
-
     padding-bottom: 20px;
+    margin-bottom: 7px;
 }
 
 .offscreenText{
@@ -139,8 +139,8 @@ body.list-view #app-container .library-item{
 }
 
 body:not(.list-view) #app-container .library-item .info-wrap .no-cover {
-    border: 1px solid #efefef;
-    border-radius: 3px;
+    /*border: 1px solid #efefef;*/
+    /*border-radius: 3px;*/
 }
 
 body:not(.list-view) #app-container .library-item .info-wrap button {
