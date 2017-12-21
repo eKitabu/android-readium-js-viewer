@@ -138,9 +138,9 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           var title = data[0];
           var grades = data[1].split(/\s*;\s*/);
           var subjects = data[2].split(/\s*;\s*/);
-          var categories = grades.concat(subjects)
+          var categories = grades.concat(subjects);
 
-          var epub = { _id: title, title, categories };
+          var epub = { _id: title, title, categories, grades, subjects };
 
           if (epub.title) {
             epubs.push(epub);
@@ -163,11 +163,12 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         return _.map(result.rows, 'doc');
       })
       .then(function (docs) {
-        return _.reject(entries, function (entry) {
-          return _.some(docs, function (doc) {
-            return doc._id === entry.name;
-          });
-        });
+        return entries;
+        // return _.reject(entries, function (entry) {
+        //   return _.some(docs, function (doc) {
+        //     return doc._id === entry.name;
+        //   });
+        // });
       });
 
       return Utils.deferizePromise(promise)
@@ -249,8 +250,13 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
 
               $.when.apply($, epubPromises).then(function() {
                 var epubs = arguments;
-                self.libraryData = epubs;
-                success(epubs);
+                self.libraryData = {
+                  epubs: epubs,
+                  allGrades : _.chain(epubs).map('grades').flatten().unique().value(),
+                  allSubjects : _.chain(epubs).map('subjects').flatten().unique().value()
+                };
+
+                success(self.libraryData);
               });
             });
           })
@@ -289,7 +295,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
                     }
                 }
 
-                self.libraryData = data;
+                self.libraryData.epubs = data;
                 success(data);
             };
 

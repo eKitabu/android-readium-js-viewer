@@ -17,12 +17,12 @@ Dialogs,
 Settings,
 Keyboard){
 
-    var initDialog = function(updateCurrentCssFilterString, showDialog) {
+    var initDialog = function(updateCurrentCssFilterString, showDialog, subjects) {
         $(".standardsTable.filterCategoriesTable td").click(function(){
             $(".filterCategoriesTable td").removeClass("selected");
             $(this).addClass("selected");
             $('.filterCategories-dialog').modal('hide');
-            var bodyStr = FilterSubjectsDialogBody({string: Strings });
+            var bodyStr = FilterSubjectsDialogBody({string: Strings, subjects: subjects });
             showDialog("filterSubjects");
 
             $('.filterSubjects-dialog .modal-body').html(bodyStr);
