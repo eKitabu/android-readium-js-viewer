@@ -25,7 +25,9 @@ define([
 'readium_js/Readium',
 'readium_shared_js/helpers',
 'pouchdb',
-'readium_shared_js/models/bookmark_data'],
+'readium_shared_js/models/bookmark_data',
+'./pouchDBHelper'],
+
 
 function (
 globalSetup,
@@ -54,7 +56,11 @@ Versioning,
 Readium,
 Helpers,
 PouchDB,
-BookmarkData){
+BookmarkData,
+PouchDBHelper){
+
+    var pouch = PouchDBHelper.getPouch('librarydb');
+
 
     // initialised in initReadium()
     var readium = undefined;
@@ -384,7 +390,6 @@ BookmarkData){
     }
 
     var loadToc = function(dom){
-
         if (dom) {
             $('script', dom).remove();
 
@@ -505,6 +510,13 @@ BookmarkData){
         readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
         {
             Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
+            var title = pageChangeData.paginationInfo.openPages[0].idref.substr(pageChangeData.paginationInfo.openPages[0].idref.indexOf('-') + 1);
+            pouch.get(title).then(function(epub) {
+              console.log(epub);
+            },function(error) {
+              console.log(error);
+            })
+
 
             if (_debugBookmarkData_goto) {
 
