@@ -370,8 +370,13 @@ PouchDB){
           return noCoverBackground;
         }
 
-        sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'author';
-        var sortedArray = _.sortBy(epubs, sortingProperty);
+        //sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'lastReadTime';
+        var sortedArray = $('#sortRecent.show_element').length ?
+          _.sortBy(epubs, 'title') :
+          _.sortBy(epubs, function(epub) {
+              return epub.lastReadTime ? -epub.lastReadTime : -1;
+          });
+
         _.each(sortedArray, function(epub, count) {
             var noCoverBackground = getFakeBackground(epub, count);
             var cssClassesString = getCategoriesCss(epub);
@@ -424,10 +429,10 @@ PouchDB){
         if (ebookURL) {
 
             var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
-            var epubTitle = eventPayload.epub.replace(/\\/g,'/').replace(/.*\//, '').split('.')[0]; //XXX Path.basename(ebookURL);
-            pouch.get('A sack of money')
+            //var epubTitle = eventPayload.epub.replace(/\\/g,'/').replace(/.*\//, '').split('.')[0]; //XXX Path.basename(ebookURL);
+            pouch.get($(this).attr('data-title') || 'A sack of money')
             .then(function (epubData) {
-              _.extendOwn(epubData, {lastRead: Date.now()});
+              _.extendOwn(epubData, {lastReadTime: Date.now()});
 
               return pouch.save(epubData);
             })
