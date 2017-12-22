@@ -26,6 +26,9 @@ define([
 'readium_shared_js/helpers',
 'pouchdb',
 'readium_shared_js/models/bookmark_data',
+
+'readium_js/epub-fetch/Utils',
+
 './pouchDBHelper'],
 
 
@@ -57,6 +60,7 @@ Readium,
 Helpers,
 PouchDB,
 BookmarkData,
+Utils,
 PouchDBHelper){
 
     var pouch = PouchDBHelper.getPouch('librarydb');
