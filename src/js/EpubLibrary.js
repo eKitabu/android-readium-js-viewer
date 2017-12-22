@@ -194,10 +194,11 @@ PouchDB){
 
     var loadFilterCategoriesDialog = function() {
         //load the categories template as a string
-        bodyStr = FilterCategoriesDialogBody({string: Strings });
+        var levels = self.grades;
+        bodyStr = FilterCategoriesDialogBody({string: Strings, levels: levels });
         showDialog("filterCategories");
         $('.filterCategories-dialog .modal-body').html(bodyStr);
-        FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog);
+        FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog, self.gradesToSubjects);
     };
 
     var showDetailsDialog = function(details){
@@ -312,8 +313,12 @@ PouchDB){
         loadLibraryItems(epubs,viewTypes.list);
     }
 
-    var loadLibraryItems = function(epubs, viewType){
-        self.epubs = epubs;
+    var loadLibraryItems = function(libData, viewType){
+        self.epubs = libData.epubs;
+        self.grades = libData.allGrades;
+        self.gradesToSubjects = libData.gradesToSubjects;
+
+        //populate subjects and grades
 
         $('#app-container .library-items').remove();
         //$('#app-container').append(LibraryBody({}));
@@ -337,7 +342,7 @@ PouchDB){
 
 
         spin(false);
-        if (!epubs.length){
+        if (!self.epubs.length){
             $('#app-container .library-items').append(EmptyLibrary({imagePathPrefix: moduleConfig.imagePathPrefix, strings: Strings}));
             return;
         }
@@ -374,8 +379,8 @@ PouchDB){
 
         //sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'lastReadTime';
         var sortedArray = $('#sortRecent.show_element').length ?
-          _.sortBy(epubs, 'title') :
-          _.sortBy(epubs, function(epub) {// filter in decreasing order
+          _.sortBy(self.epubs, 'title') :
+          _.sortBy(self.epubs, function(epub) {// filter in decreasing order
               return epub.lastReadTime ? -epub.lastReadTime : 0; //if no lastReadTime set to 0
           });
 

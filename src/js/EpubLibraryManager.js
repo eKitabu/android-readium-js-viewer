@@ -138,9 +138,9 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           var title = data[0];
           var grades = data[1].split(/\s*;\s*/);
           var subjects = data[2].split(/\s*;\s*/);
-          var categories = grades.concat(subjects)
+          var categories = grades.concat(subjects);
 
-          var epub = { _id: title, title, categories };
+          var epub = { _id: title, title, categories, grades, subjects };
 
           if (epub.title) {
             epubs.push(epub);
@@ -199,6 +199,24 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
       });
     }
 
+    function getAllGradesToSubject(epubs, grades) {
+      var allGradesToSubjects = {};
+      _.each(grades, function(grade) {
+        allGradesToSubjects[grade] = [];
+      });
+      _.each(epubs, function(epub) {
+        _.each(epub.grades, function(grade){
+          allGradesToSubjects[grade] = _.union(allGradesToSubjects[grade], epub.subjects);
+        })
+      });
+      _.chain(allGradesToSubjects)
+        .values()
+        .each(function(gradeToSubjects) {
+          gradeToSubjects.sort();
+      });
+      return allGradesToSubjects;
+    }
+
     LibraryManager.prototype = {
 
        _getFullUrl : function(packageUrl, relativeUrl){
@@ -222,10 +240,10 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         retrieveAvailableEpubs : function(success, error){
           var self = this;
           if (self.libraryData) {
-              return success(self.libraryData);
+              success(self.libraryData);
+              return;
           }
 
-          var self = this;
           var libraryPath = 'file:///sdcard/eKitabu/';
 
           Utils.deferize(cordova.plugins.permissions.requestPermission)
@@ -261,8 +279,15 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
 
               $.when.apply($, epubPromises).then(function() {
                 var epubs = arguments;
-                self.libraryData = epubs;
-                success(epubs);
+                var grades = _.chain(epubs).map('grades').flatten().unique().compact().sortBy().value();
+
+                self.libraryData = {
+                  epubs: epubs,
+                  allGrades : grades,
+                  gradesToSubjects : getAllGradesToSubject(epubs, grades)
+                };
+
+                success(self.libraryData);
               });
             });
           })
@@ -272,49 +297,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           });
 
           return;
-
-            if (this.libraryData){
-                success(this.libraryData);
-                return;
-            }
-
-            var self = this;
-
-            var indexUrl = moduleConfig.epubLibraryPath
-                        ? StorageManager.getPathUrl(moduleConfig.epubLibraryPath)
-                        : StorageManager.getPathUrl('/epub_library.json');
-
-            var dataFail = function() {
-                console.error("Ebook library fail: " + indexUrl);
-
-                self.libraryData = [];
-                success([]);
-            };
-
-            var dataSuccess = function(data) {
-                console.log("Ebook library success: " + indexUrl);
-
-                if (moduleConfig.epubLibraryPath) {
-                    for (var i = 0; i < data.length; i++) {
-                        data[i].coverHref = adjustEpubLibraryPath(data[i].coverHref);
-                        data[i].rootUrl = adjustEpubLibraryPath(data[i].rootUrl);
-                    }
-                }
-
-                self.libraryData = data;
-                success(data);
-            };
-
-            if (/\.json$/.test(indexUrl)) {
-
-                $.getJSON(moduleConfig.epubLibraryPath, function(data){
-                    dataSuccess(data);
-                }).fail(function(){
-                    dataFail();
-                });
-            } else {
-                EpubLibraryOPDS.tryParse(indexUrl, dataSuccess, dataFail);
-            }
         },
         deleteEpubWithId : function(id, success, error){
             WorkerProxy.deleteEpub(id, this.libraryData, {

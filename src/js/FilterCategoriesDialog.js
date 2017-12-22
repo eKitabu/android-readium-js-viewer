@@ -17,12 +17,14 @@ Dialogs,
 Settings,
 Keyboard){
 
-    var initDialog = function(updateCurrentCssFilterString, showDialog) {
+    var initDialog = function(updateCurrentCssFilterString, showDialog, gradesToSubjects) {
         $(".standardsTable.filterCategoriesTable td").click(function(){
             $(".filterCategoriesTable td").removeClass("selected");
             $(this).addClass("selected");
+            var selectedGrade = $(this).text();
+            var subjects = gradesToSubjects[selectedGrade];
             $('.filterCategories-dialog').modal('hide');
-            var bodyStr = FilterSubjectsDialogBody({string: Strings });
+            var bodyStr = FilterSubjectsDialogBody({string: Strings, subjects: subjects });
             showDialog("filterSubjects");
 
             $('.filterSubjects-dialog .modal-body').html(bodyStr);
