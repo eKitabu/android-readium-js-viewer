@@ -112,64 +112,57 @@ PouchDBHelper){
     }
 
     function initCredentials() {
-        var app_login = new PouchDB('app_login',{revs_limit: 1, auto_compaction: true});
-         //get new device credentials
-         //TODO: get from file
-         var credentials = {
-             _id: 'credentials',
-             user: 'test_b2db',
-             password: '41bd3d'
-         }
-        //update new credentials
-         return app_login.get(credentials._id).then(function(originalDoc)
-         {
-             credentials._rev = originalDoc._rev;
-             app_login.put( credentials).then(
-                 function(response) {
-                 }
-             );
-         }).catch(function(err) {
-             if (err.status === 404) {
-                 return app_login.put(credentials);
-             } else {
-                 console.log('Error while updating credentials in DB:' + err);
-             }
-         });
-    }
 
-    initCredentials().then(function() {
-        return app_log_db.info();
-    }).then(function (info) {
-        var app_login = new PouchDB('app_login',{revs_limit: 1, auto_compaction: true});
-        //connect to the remote sync version of the database
-        app_login.get("credentials").then(function(credentials)
-        {
-            var loginUrl = 'http://' +
-                    externalDb.url + ':' +
-                    externalDb.port + '/'+
-                    credentials.user;
-            var remote_app_log_db = new PouchDB(loginUrl, {
-                auth: {
-                    username: credentials.user,
-                    password: credentials.password
-                  }
-            });
-            //the "then" will fire if we have a remote database connection
-            remote_app_log_db.info()
-            .then(function (details) {
-                //push the most recent changes to the remote database
-                app_log_db.replicate.to(remote_app_log_db);
-            }).catch(function (err) {
-                console.log("Error trying to replicate usage data: " + err);
-            });
-        }).catch(function(err) {
-            if (err.status === 404) {
-                return app_login.put(credentials);
-            } else {
-                console.log('Error:' + err);
-            }
-        });
-    });
+       var path = "file:///sdcard/eKitabu/.sync";
+
+       return Utils.deferize(window.requestFileSystem)
+       .call(window,LocalFileSystem.PERSISTENT, 0)
+       .then(function() {
+           return Utils.deferize(window.resolveLocalFileSystemURI).call(window,path);
+       }).then(function(fileEntry) {
+           return Utils.deferize(fileEntry.file).call(fileEntry);
+       }).then(function(file) {
+           var deferred = $.Deferred();
+           var reader = new FileReader();
+           reader.onloadend = function() {
+              console.log("Successful file read: " + this.result);
+              deferred.resolve(JSON.parse(this.result));
+           };
+           reader.readAsText(file);
+           return deferred.promise();
+       });
+   }
+
+   app_log_db.info()
+   .then(function (info) {
+       //connect to the remote sync version of the database
+       initCredentials().then(function(credentials) {
+           var loginUrl = 'http://' +
+                   externalDb.url + ':' +
+                   externalDb.port + '/'+
+                   credentials.user;
+           var remote_app_log_db = new PouchDB(loginUrl, {
+               auth: {
+                   username: credentials.user,
+                   password: credentials.pass
+                 }
+           });
+           //the "then" will fire if we have a remote database connection
+           remote_app_log_db.info()
+           .then(function (details) {
+               //push the most recent changes to the remote database
+               app_log_db.replicate.to(remote_app_log_db);
+           }).catch(function (err) {
+               console.log("Error trying to replicate usage data: " + err.message);
+           });
+       }).fail(function(err) {
+           if (err.status === 404) {
+               return app_login.put(credentials);
+           } else {
+               console.log('Error:' + err);
+           }
+       });
+   });
 
     var ensureUrlIsRelativeToApp = function(ebookURL) {
 
