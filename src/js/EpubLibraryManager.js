@@ -68,7 +68,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         return {};
       })
       .then(function (doc) {
-        _.extendOwn(epubData, _.pick(doc, '_rev', 'categories'));
+        _.defaults(epubData, doc);
 
         return libraryDB.put(epubData);
       })
@@ -147,9 +147,21 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           }
         },
         complete: function () {
-          libraryDB.bulkDocs(epubs)
-          .then(function () {
-            deferred.resolve();
+          var promises = _.map(epubs, function (epub) {
+            var promise = libraryDB.get(epub._id)
+            .catch(function () {
+              return {};
+            })
+            .then(function (doc) {
+              _.extendOwn(doc, epub);
+              return libraryDB.put(doc);
+            });
+
+            return Utils.deferizePromise(promise);
+          });
+
+          $.when.apply($, promises).then(function() {
+              deferred.resolve();
           });
         }
       });
