@@ -34,12 +34,9 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
     };
 
     function fetchEpubMetadataDB(path) {
-      var promise = libraryDB.allDocs({include_docs: true})
-      .then(function (result) {
-        return _.map(result.rows, 'doc');
-      })
-      .then(function (docs) {
-        return _.find(docs, { rootUrl: path });
+      var promise = libraryDB.get(path)
+      .catch(function () {
+        return {};
       });
 
       return Utils.deferizePromise(promise);
@@ -61,7 +58,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
     }
 
     function persistEpubMetadata(epubData) {
-      epubData._id = epubData.title;
+      epubData._id = epubData.rootUrl;
 
       var promise = libraryDB.get(epubData._id)
       .catch(function () {
@@ -85,7 +82,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
     function fetchEpubMetadata(path) {
       return fetchEpubMetadataDB(path)
       .then(function (epub) {
-        if (!epub) {
+        if (!epub.title) {
           return fetchEpubMetadataFS(path)
           .then(function (epubData) {
             return persistEpubMetadata(epubData);
@@ -135,14 +132,15 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         skipEmptyLines: true,
         step: function (row) {
           var data = row.data[0];
-          var title = data[0];
+          var filename = data[0];
+          var rootUrl = 'file:///sdcard/eKitabu/' + filename;
           var grades = data[1].split(/\s*;\s*/);
           var subjects = data[2].split(/\s*;\s*/);
           var categories = grades.concat(subjects);
 
-          var epub = { _id: title, title, categories, grades, subjects };
+          var epub = { _id: rootUrl, rootUrl, categories, grades, subjects };
 
-          if (epub.title) {
+          if (epub._id) {
             epubs.push(epub);
           }
         },
@@ -176,9 +174,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
       })
       .then(function (docs) {
         return _.reject(entries, function (entry) {
-          return _.some(docs, function (doc) {
-            return doc._id === entry.name;
-          });
+          return _.some(docs, { _id: entry.name });
         });
       });
 
@@ -295,8 +291,6 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
             console.error(err);
             error && error(err);
           });
-
-          return;
         },
         deleteEpubWithId : function(id, success, error){
             WorkerProxy.deleteEpub(id, this.libraryData, {
