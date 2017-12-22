@@ -198,7 +198,7 @@ PouchDB){
         bodyStr = FilterCategoriesDialogBody({string: Strings, levels: levels });
         showDialog("filterCategories");
         $('.filterCategories-dialog .modal-body').html(bodyStr);
-        FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog, self.epubs);
+        FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog, self.gradesToSubjects);
     };
 
     var showDetailsDialog = function(details){
@@ -316,7 +316,7 @@ PouchDB){
     var loadLibraryItems = function(libData, viewType){
         self.epubs = libData.epubs;
         self.grades = libData.allGrades;
-        self.subjects = libData.allSubjects;
+        self.gradesToSubjects = libData.gradesToSubjects;
 
         //populate subjects and grades
 

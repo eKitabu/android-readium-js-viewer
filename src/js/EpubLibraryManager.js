@@ -200,6 +200,19 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
       });
     }
 
+    function getAllGradesToSubject(epubs, grades) {
+      var allGradesToSubjects = {};
+      _.each(grades, function(grade) {
+        allGradesToSubjects[grade] = [];
+      });
+      _.each(epubs, function(epub) {
+        _.each(epub.grades, function(grade){
+          allGradesToSubjects[grade] = _.union(allGradesToSubjects[grade], epub.subjects);
+        })
+      });
+      return allGradesToSubjects;
+    }
+
     LibraryManager.prototype = {
 
        _getFullUrl : function(packageUrl, relativeUrl){
@@ -262,10 +275,12 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
 
               $.when.apply($, epubPromises).then(function() {
                 var epubs = arguments;
+                var grades = _.chain(epubs).map('grades').flatten().unique().compact().value();
+
                 self.libraryData = {
                   epubs: epubs,
-                  allGrades : _.chain(epubs).map('grades').flatten().unique().value(),
-                  allSubjects : _.chain(epubs).map('subjects').flatten().unique().value()
+                  allGrades : grades,
+                  gradesToSubjects : getAllGradesToSubject(epubs, grades)
                 };
 
                 success(self.libraryData);

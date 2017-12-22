@@ -17,19 +17,13 @@ Dialogs,
 Settings,
 Keyboard){
 
-    var initDialog = function(updateCurrentCssFilterString, showDialog, epubs) {
+    var initDialog = function(updateCurrentCssFilterString, showDialog, gradesToSubjects) {
         $(".standardsTable.filterCategoriesTable td").click(function(){
             $(".filterCategoriesTable td").removeClass("selected");
             $(this).addClass("selected");
             var selectedCategory = $(this).text();
+            var subjects = gradesToSubjects[selectedCategory];
             $('.filterCategories-dialog').modal('hide');
-            var subjects = _.chain(epubs)
-                .filter(function(epub) {
-                    return epub.categories && epub.categories.indexOf(selectedCategory) !== -1;
-                })
-                .map('subjects')
-                .flatten()
-                .value();
             var bodyStr = FilterSubjectsDialogBody({string: Strings, subjects: subjects });
             showDialog("filterSubjects");
 
