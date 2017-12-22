@@ -211,10 +211,10 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
         retrieveAvailableEpubs : function(success, error){
           var self = this;
           if (self.libraryData) {
-              return success(self.libraryData);
+              success(self.libraryData);
+              return;
           }
 
-          var self = this;
           var libraryPath = 'file:///sdcard/eKitabu/';
 
           Utils.deferize(cordova.plugins.permissions.requestPermission)
@@ -267,48 +267,48 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
 
           return;
 
-            if (this.libraryData){
-                success(this.libraryData);
-                return;
-            }
+            // if (this.libraryData){
+            //     success(this.libraryData);
+            //     return;
+            // }
 
-            var self = this;
+            // var self = this;
 
-            var indexUrl = moduleConfig.epubLibraryPath
-                        ? StorageManager.getPathUrl(moduleConfig.epubLibraryPath)
-                        : StorageManager.getPathUrl('/epub_library.json');
+            // var indexUrl = moduleConfig.epubLibraryPath
+            //             ? StorageManager.getPathUrl(moduleConfig.epubLibraryPath)
+            //             : StorageManager.getPathUrl('/epub_library.json');
 
-            var dataFail = function() {
-                console.error("Ebook library fail: " + indexUrl);
+            // var dataFail = function() {
+            //     console.error("Ebook library fail: " + indexUrl);
 
-                self.libraryData = [];
-                success([]);
-            };
+            //     self.libraryData = [];
+            //     success([]);
+            // };
 
-            var dataSuccess = function(data) {
-                console.log("Ebook library success: " + indexUrl);
+            // var dataSuccess = function(data) {
+            //     console.log("Ebook library success: " + indexUrl);
 
-                if (moduleConfig.epubLibraryPath) {
-                    for (var i = 0; i < data.length; i++) {
-                        data[i].coverHref = adjustEpubLibraryPath(data[i].coverHref);
-                        data[i].rootUrl = adjustEpubLibraryPath(data[i].rootUrl);
-                    }
-                }
+            //     if (moduleConfig.epubLibraryPath) {
+            //         for (var i = 0; i < data.length; i++) {
+            //             data[i].coverHref = adjustEpubLibraryPath(data[i].coverHref);
+            //             data[i].rootUrl = adjustEpubLibraryPath(data[i].rootUrl);
+            //         }
+            //     }
 
-                self.libraryData.epubs = data;
-                success(data);
-            };
+            //     self.libraryData.epubs = data;
+            //     success(data);
+            // };
 
-            if (/\.json$/.test(indexUrl)) {
+            // if (/\.json$/.test(indexUrl)) {
 
-                $.getJSON(moduleConfig.epubLibraryPath, function(data){
-                    dataSuccess(data);
-                }).fail(function(){
-                    dataFail();
-                });
-            } else {
-                EpubLibraryOPDS.tryParse(indexUrl, dataSuccess, dataFail);
-            }
+            //     $.getJSON(moduleConfig.epubLibraryPath, function(data){
+            //         dataSuccess(data);
+            //     }).fail(function(){
+            //         dataFail();
+            //     });
+            // } else {
+            //     EpubLibraryOPDS.tryParse(indexUrl, dataSuccess, dataFail);
+            // }
         },
         deleteEpubWithId : function(id, success, error){
             WorkerProxy.deleteEpub(id, this.libraryData, {
