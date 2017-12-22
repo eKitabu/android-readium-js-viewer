@@ -438,7 +438,7 @@ PouchDB){
 
             var eventPayload = {embedded: embedded, epub: ebookURL, epubs: libraryURL};
 
-            pouch.get($(this).attr('data-title'))
+            pouch.get(ebookURL)
             .then(function (epubData) {
               _.extendOwn(epubData, {lastReadTime: Date.now()});
 
@@ -451,7 +451,7 @@ PouchDB){
                   }
               });
             })
-            .then(function (a){
+            .then(function () {
                 $(window).triggerHandler('readepub', eventPayload);
             }, function(err) {
                 console.error('problem with saving lastReadStatus', err);
