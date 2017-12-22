@@ -21,8 +21,8 @@ Keyboard){
         $(".standardsTable.filterCategoriesTable td").click(function(){
             $(".filterCategoriesTable td").removeClass("selected");
             $(this).addClass("selected");
-            var selectedCategory = $(this).text();
-            var subjects = gradesToSubjects[selectedCategory];
+            var selectedGrade = $(this).text();
+            var subjects = gradesToSubjects[selectedGrade];
             $('.filterCategories-dialog').modal('hide');
             var bodyStr = FilterSubjectsDialogBody({string: Strings, subjects: subjects });
             showDialog("filterSubjects");
