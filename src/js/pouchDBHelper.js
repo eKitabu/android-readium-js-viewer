@@ -13,10 +13,8 @@ function(PouchDB, _, Utils){
             include_docs: true
           })
           .then(db => {
-            // re-map rows to collection of items
-            return _.max(db.rows.map(row => {
-                return row.doc;
-            }), 'lastReadTime');
+            // get recent epub
+            return _.chain(db.rows).map('doc').max('lastReadTime').value();
           });
           return isJqueryPromise ? Utils.deferizePromise(es6Promise) : es6Promise;
       }
