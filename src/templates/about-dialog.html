@@ -3,28 +3,21 @@
     <div class="modal-content">
       <div class="modal-body">
           <div class="splash-logo">
-              <img src="{{{imagePathPrefix}}}images/about_readium_logo.png" alt="">
+              <img src="{{{imagePathPrefix}}}images/large.png" alt="">
           </div>
 
-          <div class="about-message">
-              <span>{{{strings.i18n_html_readium_tm_a_project}}}</span>
+        <h4 style="color:#111155">eKitabu ereader</h4>
+        <div class="version">Version 3.2.3</div>
+        <div class="about-message">
+          <span>The eKitabu ereader is based on ReadiumJS, an open standards reading system developed by the Readium Project open source community supported by the Readium Foundation http://www.readium.org.
+            Portions Copyright (c) 2014 Readium Foundation and/or its licensees. All rights reserved.
+            and Copyright (c) 2018 eKitabu LLC</span>
           </div>
-          <div>
-                 <img src="{{{imagePathPrefix}}}images/partner_logos.png" alt="{{{strings.i18n_alt_about_logos}}}">
-            </div>
-        <h4 style="color:#111155">{{{strings.gethelp}}}</h4>
-        <div class="version">{{viewerJs.chromeVersion}}</div>
-        <div class="build-date">{{dateTimeString}}</div>
-        <div class="version-details">
-            
-          <div><a target="_blank" href="https://github.com/readium/readium-js-viewer/tree/{{viewerJs.sha}}">readium-js-viewer@{{viewerJs.sha}}</a>{{^viewerJs.clean}}<span class="local-changes-alert"> ({{{strings.gitHasLocalChanges}}})</span>{{/viewerJs.clean}}</div>
-          
-          <div><a target="_blank" href="https://github.com/readium/readium-js/tree/{{readiumJs.sha}}">readium-js@{{readiumJs.sha}}</a>{{^readiumJs.clean}}<span class="local-changes-alert"> ({{{strings.gitHasLocalChanges}}})</span>{{/readiumJs.clean}}</div>
-          
-          <div><a target="_blank" href="https://github.com/readium/readium-shared-js/tree/{{sharedJs.sha}}">readium-shared-js@{{sharedJs.sha}}</a>{{^sharedJs.clean}}<span class="local-changes-alert"> ({{{strings.gitHasLocalChanges}}})</span>{{/sharedJs.clean}}</div>
-          
-          <div><a target="_blank" href="https://github.com/readium/readium-cfi-js/tree/{{cfiJs.sha}}">readium-cfi-js@{{cfiJs.sha}}</a>{{^cfiJs.clean}}<span class="local-changes-alert"> ({{{strings.gitHasLocalChanges}}})</span>{{/cfiJs.clean}}</div>
-        </div>
+          <div class="about-message">
+            For support please contact:
+            <div><a href="mailto:support@ekitabu.com "></a>support@ekitabu.com</div>
+            +254 708 727 037
+          </div>
       </div>
     </div><!-- /.modal-content -->
   </div><!-- /.modal-dialog -->
