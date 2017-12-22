@@ -112,16 +112,15 @@ PouchDBHelper){
     }
 
     function initCredentials() {
+        var path = "file:///sdcard/eKitabu/.sync";
 
-       var path = "file:///sdcard/eKitabu/.sync";
-
-       return Utils.deferize(window.requestFileSystem)
-       .call(window,LocalFileSystem.PERSISTENT, 0)
-       .then(function() {
+        return Utils.deferize(window.requestFileSystem)
+        .call(window,LocalFileSystem.PERSISTENT, 0)
+        .then(function() {
            return Utils.deferize(window.resolveLocalFileSystemURI).call(window,path);
-       }).then(function(fileEntry) {
+        }).then(function(fileEntry) {
            return Utils.deferize(fileEntry.file).call(fileEntry);
-       }).then(function(file) {
+        }).then(function(file) {
            var deferred = $.Deferred();
            var reader = new FileReader();
            reader.onloadend = function() {
@@ -130,13 +129,13 @@ PouchDBHelper){
            };
            reader.readAsText(file);
            return deferred.promise();
-       });
+        });
    }
 
    app_log_db.info()
    .then(function (info) {
-       //connect to the remote sync version of the database
-       initCredentials().then(function(credentials) {
+        //connect to the remote sync version of the database
+        initCredentials().then(function(credentials) {
            var loginUrl = 'http://' +
                    externalDb.url + ':' +
                    externalDb.port + '/'+
@@ -155,13 +154,13 @@ PouchDBHelper){
            }).catch(function (err) {
                console.log("Error trying to replicate usage data: " + err.message);
            });
-       }).fail(function(err) {
+        }).fail(function(err) {
            if (err.status === 404) {
                return app_login.put(credentials);
            } else {
                console.log('Error:' + err);
            }
-       });
+        });
    });
 
     var ensureUrlIsRelativeToApp = function(ebookURL) {
