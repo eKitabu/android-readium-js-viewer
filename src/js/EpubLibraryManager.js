@@ -210,6 +210,11 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           allGradesToSubjects[grade] = _.union(allGradesToSubjects[grade], epub.subjects);
         })
       });
+      _.chain(allGradesToSubjects)
+        .values()
+        .each(function(gradeToSubjects) {
+          gradeToSubjects.sort();
+      });
       return allGradesToSubjects;
     }
 
@@ -275,7 +280,7 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
 
               $.when.apply($, epubPromises).then(function() {
                 var epubs = arguments;
-                var grades = _.chain(epubs).map('grades').flatten().unique().compact().value();
+                var grades = _.chain(epubs).map('grades').flatten().unique().compact().sortBy().value();
 
                 self.libraryData = {
                   epubs: epubs,
