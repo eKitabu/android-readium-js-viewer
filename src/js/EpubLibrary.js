@@ -198,7 +198,7 @@ PouchDB){
         bodyStr = FilterCategoriesDialogBody({string: Strings, levels: levels });
         showDialog("filterCategories");
         $('.filterCategories-dialog .modal-body').html(bodyStr);
-        FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog, self.subjects);
+        FilterCategoriesDialogController.initDialog(updateCurrentCssFilterString, showDialog, self.epubs);
     };
 
     var showDetailsDialog = function(details){
