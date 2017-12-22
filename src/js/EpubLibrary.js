@@ -88,6 +88,7 @@ PouchDB){
         //maxHeightRule
 
     var pouch = new PouchDBHelper.getPouch('librarydb');
+    self.sortRecent = true;
 
     var spin = function(on)
     {
@@ -369,7 +370,7 @@ PouchDB){
           return cssClassesString;
         }
 
-      function getFakeBackground(epub, count) {
+        function getFakeBackground(epub, count) {
           var noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover' + ((count % 8) + 1) + '.jpg';
           if (epub.isSubLibraryLink) {
               noCoverBackground = moduleConfig.imagePathPrefix + 'images/covers/cover2.jpg';
@@ -378,7 +379,7 @@ PouchDB){
         }
 
         //sortingProperty = $('#sortRecent.show_element').length ? 'title' : 'lastReadTime';
-        var sortedArray = $('#sortRecent.show_element').length ?
+        var sortedArray = !self.sortRecent ?
           _.sortBy(self.epubs, 'title') :
           _.sortBy(self.epubs, function(epub) {// filter in decreasing order
               return epub.lastReadTime ? -epub.lastReadTime : 0; //if no lastReadTime set to 0
@@ -786,17 +787,22 @@ PouchDB){
         });
 
         $('#sortRecent').on('click', function(){
+            self.sortRecent = true;
             $('.sorting-books').toggleClass('show_element');
             $('#app-container .library-items').remove();
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
             setTimeout(function(){ $('#sortAlphabetic').focus(); }, 50);
         });
         $('#sortAlphabetic').on('click', function(){
+            self.sortRecent = false;
             $('.sorting-books').toggleClass('show_element');
             $('#app-container .library-items').remove();
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
             setTimeout(function(){ $('#sortRecent').focus(); }, 50);
         });
+
+        $('#sortAlphabetic').toggleClass('show_element',self.sortRecent);
+        $('#sortRecent').toggleClass('show_element',!self.sortRecent);
 
         $("#clearFilters").click(function() {
             currentCssFilterString = "";
