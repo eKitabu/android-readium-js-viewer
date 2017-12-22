@@ -26,8 +26,12 @@ define([
 'readium_shared_js/helpers',
 'pouchdb',
 'readium_shared_js/models/bookmark_data',
+
 'readium_js/epub-fetch/Utils',
+
 './pouchDBHelper'],
+
+
 function (
 globalSetup,
 Globals,
@@ -60,6 +64,7 @@ Utils,
 PouchDBHelper){
 
     var pouch = PouchDBHelper.getPouch('librarydb');
+
 
     // initialised in initReadium()
     var readium = undefined;
@@ -107,7 +112,6 @@ PouchDBHelper){
     }
 
     function initCredentials() {
-
         var path = "file:///sdcard/eKitabu/.sync";
 
         return Utils.deferize(window.requestFileSystem)
@@ -120,22 +124,22 @@ PouchDBHelper){
             var deferred = $.Deferred();
             var reader = new FileReader();
             reader.onloadend = function() {
-               console.log("Successful file read: " + this.result);
-               deferred.resolve(JSON.parse(this.result));
+                console.log("Successful file read: " + this.result);
+                deferred.resolve(JSON.parse(this.result));
             };
             reader.readAsText(file);
             return deferred.promise();
         });
-    }
+   }
 
-    app_log_db.info()
-    .then(function (info) {
+   app_log_db.info()
+   .then(function (info) {
         //connect to the remote sync version of the database
         initCredentials().then(function(credentials) {
             var loginUrl = 'http://' +
-                    externalDb.url + ':' +
-                    externalDb.port + '/'+
-                    credentials.user;
+                  externalDb.url + ':' +
+                  externalDb.port + '/'+
+                  credentials.user;
             var remote_app_log_db = new PouchDB(loginUrl, {
                 auth: {
                     username: credentials.user,
@@ -502,13 +506,12 @@ PouchDBHelper){
         readium.reader.on(ReadiumSDK.Events.PAGINATION_CHANGED, function (pageChangeData)
         {
             Globals.logEvent("PAGINATION_CHANGED", "ON", "EpubReader.js");
-            var title = pageChangeData.paginationInfo.openPages[0].idref.substr(pageChangeData.paginationInfo.openPages[0].idref.indexOf('-') + 1);
-            pouch.get(title).then(function(epub) {
-              console.log(epub);
-            },function(error) {
-              console.log(error);
-            })
-
+            pouch.getRecentBook().then(function(epub) {
+                epub.page = pageChangeData.paginationInfo.openPages[0];
+                return pouch.save(epub).then(function(epubRes) {
+                    console.log('epub', epubRes);
+                });
+            });
 
             if (_debugBookmarkData_goto) {
 
@@ -1513,8 +1516,13 @@ PouchDBHelper){
                 // Debug check:
                 //console.debug(JSON.stringify(window.navigator.epubReadingSystem, undefined, 2));
 
+                pouch.getRecentBook().then(function(epub) {
 
-                loadEbook(readerSettings, openPageRequest);
+                    loadEbook(readerSettings, epub.page);
+                    //epub.page = ChangeData.paginationInfo.openPages[0];
+                });
+
+
             });
         });
     }
