@@ -121,14 +121,14 @@ PouchDBHelper){
         }).then(function(fileEntry) {
             return Utils.deferize(fileEntry.file).call(fileEntry);
         }).then(function(file) {
-             var deferred = $.Deferred();
-             var reader = new FileReader();
-             reader.onloadend = function() {
-                  console.log("Successful file read: " + this.result);
-                  deferred.resolve(JSON.parse(this.result));
-             };
-             reader.readAsText(file);
-             return deferred.promise();
+            var deferred = $.Deferred();
+            var reader = new FileReader();
+            reader.onloadend = function() {
+                console.log("Successful file read: " + this.result);
+                deferred.resolve(JSON.parse(this.result));
+            };
+            reader.readAsText(file);
+            return deferred.promise();
         });
    }
 
@@ -137,16 +137,16 @@ PouchDBHelper){
         //connect to the remote sync version of the database
         initCredentials().then(function(credentials) {
             var loginUrl = 'http://' +
-                externalDb.url + ':' +
-                externalDb.port + '/'+
-                credentials.user;
+                  externalDb.url + ':' +
+                  externalDb.port + '/'+
+                  credentials.user;
             var remote_app_log_db = new PouchDB(loginUrl, {
                 auth: {
                     username: credentials.user,
                     password: credentials.pass
                   }
             });
-           //the "then" will fire if we have a remote database connection
+            //the "then" will fire if we have a remote database connection
             remote_app_log_db.info()
             .then(function (details) {
                 //push the most recent changes to the remote database
@@ -156,12 +156,12 @@ PouchDBHelper){
             });
         }).fail(function(err) {
             if (err.status === 404) {
-               return app_login.put(credentials);
+                return app_login.put(credentials);
             } else {
-               console.log('Error:' + err);
+                console.log('Error:' + err);
             }
         });
-   });
+    });
 
     var ensureUrlIsRelativeToApp = function(ebookURL) {
 
