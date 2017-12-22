@@ -117,18 +117,18 @@ PouchDBHelper){
         return Utils.deferize(window.requestFileSystem)
         .call(window,LocalFileSystem.PERSISTENT, 0)
         .then(function() {
-           return Utils.deferize(window.resolveLocalFileSystemURI).call(window,path);
+            return Utils.deferize(window.resolveLocalFileSystemURI).call(window,path);
         }).then(function(fileEntry) {
-           return Utils.deferize(fileEntry.file).call(fileEntry);
+            return Utils.deferize(fileEntry.file).call(fileEntry);
         }).then(function(file) {
-           var deferred = $.Deferred();
-           var reader = new FileReader();
-           reader.onloadend = function() {
-              console.log("Successful file read: " + this.result);
-              deferred.resolve(JSON.parse(this.result));
-           };
-           reader.readAsText(file);
-           return deferred.promise();
+             var deferred = $.Deferred();
+             var reader = new FileReader();
+             reader.onloadend = function() {
+                  console.log("Successful file read: " + this.result);
+                  deferred.resolve(JSON.parse(this.result));
+             };
+             reader.readAsText(file);
+             return deferred.promise();
         });
    }
 
@@ -136,30 +136,30 @@ PouchDBHelper){
    .then(function (info) {
         //connect to the remote sync version of the database
         initCredentials().then(function(credentials) {
-           var loginUrl = 'http://' +
-                   externalDb.url + ':' +
-                   externalDb.port + '/'+
-                   credentials.user;
-           var remote_app_log_db = new PouchDB(loginUrl, {
-               auth: {
-                   username: credentials.user,
-                   password: credentials.pass
-                 }
-           });
+            var loginUrl = 'http://' +
+                externalDb.url + ':' +
+                externalDb.port + '/'+
+                credentials.user;
+            var remote_app_log_db = new PouchDB(loginUrl, {
+                auth: {
+                    username: credentials.user,
+                    password: credentials.pass
+                  }
+            });
            //the "then" will fire if we have a remote database connection
-           remote_app_log_db.info()
-           .then(function (details) {
-               //push the most recent changes to the remote database
-               app_log_db.replicate.to(remote_app_log_db);
-           }).catch(function (err) {
-               console.log("Error trying to replicate usage data: " + err.message);
-           });
+            remote_app_log_db.info()
+            .then(function (details) {
+                //push the most recent changes to the remote database
+                app_log_db.replicate.to(remote_app_log_db);
+            }).catch(function (err) {
+                console.log("Error trying to replicate usage data: " + err.message);
+            });
         }).fail(function(err) {
-           if (err.status === 404) {
+            if (err.status === 404) {
                return app_login.put(credentials);
-           } else {
+            } else {
                console.log('Error:' + err);
-           }
+            }
         });
    });
 
