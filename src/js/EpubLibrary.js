@@ -310,6 +310,7 @@ PouchDB){
     }
 
     var loadLibraryItems = function(libData, viewType){
+        self.viewType = viewType ? viewType : self.viewType;
         self.epubs = libData.epubs;
         self.grades = libData.allGrades;
         self.gradesToSubjects = libData.gradesToSubjects;
@@ -319,20 +320,20 @@ PouchDB){
         $('#app-container .library-items').remove();
         //$('#app-container').append(LibraryBody({}));
         //if the view type isn't specified, check if we have the list-view class
-        if (typeof(viewType) === 'undefined') {
+        if (typeof(self.viewType) === 'undefined') {
                 if ($('body').hasClass("list-view")) {
-                    viewType = viewTypes.list;
+                    self.viewType = viewTypes.list;
                 }
                 else {
-                    viewType = viewTypes.grid;
+                    self.viewType = viewTypes.grid;
                 }
         }//if
 
-        if (viewType === viewTypes.list) {
+        if (self.viewType === viewTypes.list) {
             $('#app-container').append(LibraryBodyListView({}));
         }
         //Load GRID VIEW library body
-        else if (viewType === viewTypes.grid){
+        else if (self.viewType === viewTypes.grid){
             $('#app-container').append(LibraryBody({}));
         }
 
