@@ -93,7 +93,6 @@ PouchDB){
     var spin = function(on)
     {
         if (on) {
-    //console.error("do SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
             if (spinner.willSpin || spinner.isSpinning) return;
 
             spinner.willSpin = true;
@@ -102,12 +101,10 @@ PouchDB){
             {
                 if (spinner.stopRequested)
                 {
-    //console.debug("STOP REQUEST: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                     spinner.willSpin = false;
                     spinner.stopRequested = false;
                     return;
                 }
-    //console.debug("SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                 spinner.isSpinning = true;
                 spinner.spin($('#app-container')[0]);
                 $('#app-container').append(LoadingDiv());
@@ -118,14 +115,12 @@ PouchDB){
 
             if (spinner.isSpinning)
             {
-//console.debug("!! SPIN: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                 spinner.stop();
                 $('#app-container .loading').remove();
                 spinner.isSpinning = false;
             }
             else if (spinner.willSpin)
             {
-//console.debug("!! SPIN REQ: -- WILL: " + spinner.willSpin + " IS:" + spinner.isSpinning + " STOP REQ:" + spinner.stopRequested);
                 spinner.stopRequested = true;
             }
         }

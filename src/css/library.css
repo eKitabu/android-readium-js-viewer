@@ -339,7 +339,7 @@ table.filterCategoriesTable td.selected
 .loading {
     text-align:center;
     font-size: 22px;
-    top: 48%;
+    top: calc(50% - 22px);
     width:100%;
     position: absolute;
 }
