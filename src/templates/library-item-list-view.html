@@ -25,7 +25,7 @@
         {{/epub.isSubLibraryLink}}
 
         aria-label="({{count.n}}) {{epub.title}}" title="({{count.n}}) "  tabindex="{{count.tabindex}}">
-{{epub.title}}
+{{epub.title}}{{^epub.title}}[No Title Listed]{{/epub.title}}
     </button>
 </td>
 <td>

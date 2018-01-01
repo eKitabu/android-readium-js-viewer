@@ -447,3 +447,27 @@ ul#bookCurrentCategories li
     margin-left: 5px;
 
 }
+
+#app-navbar {
+    height: 5%;
+    max-height: 50px;
+}
+
+
+#app-navbar .btn-group {
+    height: 100%;
+}
+
+#app-navbar .btn-group .btn {
+    height: 100%;
+    padding: 0;
+}
+
+#app-navbar .btn-group .btn img, #app-navbar .btn-group .btn span {
+    height: 50%;
+}
+
+#app-navbar .btn-group .btn span:before {
+    height: 100%;
+    font-size: larger;
+}
