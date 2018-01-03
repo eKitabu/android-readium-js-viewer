@@ -108,7 +108,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var epub = eventPayload.epub;
         if (epub && (typeof epub !== "string")) {
             epub = ebookURL_filepath;
-        }        
+        }
 
         ebookURL_filepath = EpubReader.ensureUrlIsRelativeToApp(ebookURL_filepath);
 
@@ -164,6 +164,10 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
 
     document.addEventListener("backbutton", function(event) {
       event.stopPropagation();
+      if($("#closeSettingsCross").is(":visible")) {
+        $("#closeSettingsCross").trigger('click');
+        return;
+      }
       if($(".library-items").length === 0) {
         $(window).trigger('loadlibrary');
       } else {
