@@ -145,7 +145,9 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
           }
         },
         complete: function () {
-          var promises = _.map(epubs, function (epub) {
+          var promises = _.chain(epubs)
+          .uniq('_id')
+          .map(function (epub) {
             var promise = libraryDB.get(epub._id)
             .catch(function () {
               return {};
@@ -159,7 +161,8 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
             });
 
             return Utils.deferizePromise(promise);
-          });
+          })
+          .value();
 
           $.when.apply($, promises).then(function() {
               deferred.resolve();
