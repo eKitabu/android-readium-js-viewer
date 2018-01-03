@@ -176,19 +176,11 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
 
     document.addEventListener("backbutton", function(event) {
       event.stopPropagation();
-<<<<<<< Updated upstream
-      if($("#closeSettingsCross").is(":visible")) {
-        $("#closeSettingsCross").trigger('click');
-        return;
-      }
-=======
-
 
       if (returnBackFromModals()) {
         return;
       }
 
->>>>>>> Stashed changes
       if($(".library-items").length === 0) {
         $(window).trigger('loadlibrary');
       } else {
