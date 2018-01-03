@@ -152,9 +152,10 @@ define(['jquery', 'underscore', './ModuleConfig', './PackageParser', './workers/
             })
             .then(function (doc) {
               _.extendOwn(doc, epub);
-              return libraryDB.put(doc).catch(function () {
-                return {};
-              });
+              return libraryDB.put(doc);
+            })
+            .catch(function() {
+              return {};
             });
 
             return Utils.deferizePromise(promise);
