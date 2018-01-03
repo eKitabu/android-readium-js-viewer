@@ -162,12 +162,33 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         libraryView(libraryURL, importEPUB);
     });
 
+    function returnBackFromModals() {
+        var modalSelectorArray = ["#closeSettingsCross", "#about-dialog", "#filterCategories-dialog", "#filterSubjects-dialog"];
+        var hasModal = false
+        _.each(modalSelectorArray, function(selectorModal) {
+            if($(selectorModal).is(":visible")) {
+                $(selectorModal).trigger('click');
+                hasModal = true;
+            }
+        })
+        return hasModal;
+    }
+
     document.addEventListener("backbutton", function(event) {
       event.stopPropagation();
+<<<<<<< Updated upstream
       if($("#closeSettingsCross").is(":visible")) {
         $("#closeSettingsCross").trigger('click');
         return;
       }
+=======
+
+
+      if (returnBackFromModals()) {
+        return;
+      }
+
+>>>>>>> Stashed changes
       if($(".library-items").length === 0) {
         $(window).trigger('loadlibrary');
       } else {
