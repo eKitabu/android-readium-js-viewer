@@ -471,3 +471,7 @@ ul#bookCurrentCategories li
     height: 100%;
     font-size: larger;
 }
+
+#backgroundAudioTrack-div {
+    height: 100%;
+}
