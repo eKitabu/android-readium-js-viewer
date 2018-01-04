@@ -134,6 +134,9 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
     });
 
     $(window).on('loadlibrary', function(e, eventPayload){
+
+        $("html").attr("data-theme", "library");
+
         var libraryURL = undefined;
         var importEPUB = undefined;
         if (typeof eventPayload === "string") {

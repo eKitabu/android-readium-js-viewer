@@ -351,6 +351,7 @@ PouchDB){
         {
             $(".library-item").hide();
             $(currentCssFilterString).show();
+            $("#clearFilters").prop("disabled",false);
         }
 
         function getCategoriesCss(epub) {
