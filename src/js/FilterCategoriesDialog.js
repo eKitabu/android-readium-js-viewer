@@ -48,8 +48,6 @@ Keyboard){
               $(filterString).show();
               updateCurrentCssFilterString(filterString, selectedFilters);
               $('.filterSubjects-dialog').modal('hide');
-
-              $('#clearFilters').prop('disabled', false);
             });
         });
     }

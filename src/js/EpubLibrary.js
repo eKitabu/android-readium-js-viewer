@@ -351,7 +351,6 @@ PouchDB){
         {
             $(".library-item").hide();
             $(currentCssFilterString).show();
-            $("#clearFilters").prop("disabled",false);
         }
 
         function getCategoriesCss(epub) {
@@ -805,7 +804,6 @@ PouchDB){
             currentCssFilterString = "";
             currentSelectedCategories = [];
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
-            $('#clearFilters').prop('disabled', true);
         });
 
         findHeightRule();
