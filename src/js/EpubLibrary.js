@@ -804,6 +804,7 @@ PouchDB){
             currentCssFilterString = "";
             currentSelectedCategories = [];
             libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+            $('#clearFilters').prop('disabled', true);
         });
 
         findHeightRule();

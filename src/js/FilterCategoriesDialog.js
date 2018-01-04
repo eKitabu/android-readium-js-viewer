@@ -49,7 +49,7 @@ Keyboard){
               updateCurrentCssFilterString(filterString, selectedFilters);
               $('.filterSubjects-dialog').modal('hide');
 
-
+              $('#clearFilters').prop('disabled', false);
             });
         });
     }
