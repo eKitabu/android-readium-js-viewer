@@ -108,7 +108,7 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         var epub = eventPayload.epub;
         if (epub && (typeof epub !== "string")) {
             epub = ebookURL_filepath;
-        }        
+        }
 
         ebookURL_filepath = EpubReader.ensureUrlIsRelativeToApp(ebookURL_filepath);
 
@@ -162,8 +162,25 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
         libraryView(libraryURL, importEPUB);
     });
 
+    function returnBackFromModals() {
+        var modalSelectorArray = ["#closeSettingsCross", "#about-dialog", "#filterCategories-dialog", "#filterSubjects-dialog"];
+        var hasModal = false
+        _.each(modalSelectorArray, function(selectorModal) {
+            if($(selectorModal).is(":visible")) {
+                $(selectorModal).trigger('click');
+                hasModal = true;
+            }
+        })
+        return hasModal;
+    }
+
     document.addEventListener("backbutton", function(event) {
       event.stopPropagation();
+
+      if (returnBackFromModals()) {
+        return;
+      }
+
       if($(".library-items").length === 0) {
         $(window).trigger('loadlibrary');
       } else {
