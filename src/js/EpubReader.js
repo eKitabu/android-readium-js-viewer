@@ -94,6 +94,7 @@ PouchDBHelper){
     };
 
     Helpers.logAppOpenEvent();
+    Helpers.appClosePollLogAndBegin();
 
     //print out current database info
     var app_log_db = new PouchDB('app_log_db');
