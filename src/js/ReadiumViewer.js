@@ -190,7 +190,11 @@ define(['jquery', './EpubLibrary', './EpubReader', 'readium_shared_js/helpers', 
       }
 
       if (isLibraryView()) {
-        window.plugins.appMinimize.minimize();
+        if (EpubLibrary.hasCategoryFilters()) {
+          EpubLibrary.clearCategoryFilters();
+        } else {
+          window.plugins.appMinimize.minimize();
+        }
       } else {
         $(window).trigger('loadlibrary');
       }

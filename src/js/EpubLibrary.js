@@ -713,6 +713,16 @@ PouchDB){
         });
     }
 
+    var hasCategoryFilters = function () {
+      return currentCssFilterString !== '';
+    };
+
+    var clearCategoryFilters = function () {
+      currentCssFilterString = '';
+      currentSelectedCategories = [];
+      libraryManager.retrieveAvailableEpubs(loadLibraryItems);
+    };
+
     var loadLibraryUI = function(){
 
         Dialogs.reset();
@@ -800,11 +810,7 @@ PouchDB){
         $('#sortAlphabetic').toggleClass('show_element',self.sortRecent);
         $('#sortRecent').toggleClass('show_element',!self.sortRecent);
 
-        $("#clearFilters").click(function() {
-            currentCssFilterString = "";
-            currentSelectedCategories = [];
-            libraryManager.retrieveAvailableEpubs(loadLibraryItems);
-        });
+        $("#clearFilters").click(clearCategoryFilters);
 
         findHeightRule();
         setItemHeight();
@@ -887,6 +893,8 @@ PouchDB){
     return {
         loadUI : applyKeyboardSettingsAndLoadUi,
         unloadUI : unloadLibraryUI,
-        importEpub : importEpub
+        importEpub : importEpub,
+        hasCategoryFilters: hasCategoryFilters,
+        clearCategoryFilters: clearCategoryFilters
     };
 });
