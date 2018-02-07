@@ -1,3 +1,3 @@
 [submodule "readium-js"]
 	path = readium-js
-	url = https://gitlab.asteasolutions.net/ekitabu/readium-js.git
+	url = https://github.com/eKitabu/android-readium-js.git
