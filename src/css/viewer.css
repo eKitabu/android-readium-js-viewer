@@ -99,12 +99,12 @@ direction: rtl;
   width: 48px;
   height: 36px;
   background: no-repeat center center;
-  background-color: #c3f0f4;
+  background-color: #e4e4e4;
 }
 
 .navbar
 {
-  background: #c3f0f4;
+  background: #e4e4e4;
   box-shadow: 0px 1px 5px #333;
   border-radius: 0px;
   min-height: 36px;
@@ -118,7 +118,7 @@ direction: rtl;
     margin-right: 0 !important;
 
     min-height: 36px;
-    background-color: #c3f0f4;
+    background-color: #e4e4e4;
 }
 
 .book-title-header{
@@ -165,7 +165,7 @@ html[data-theme=night-theme] .modal
 }*/
 
 .navbar .icon-logo, .navbar .icon-logo:active{
-  background-image: url('../images/edt-logo-small.png');
+  background-image: url('../images/ekitabu-logo-small.png');
   width: 130px;
   background-size: auto 28px !important;
 }
@@ -613,7 +613,7 @@ ul.nav-tabs li:not(.active) button:hover
   text-align: right;
 }
 .zoom-wrapper input[disabled]{
-  background-color: #c3f0f4;
+  background-color: #e4e4e4;
   color: #ddd;
 }
 

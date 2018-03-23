@@ -1,5 +1,5 @@
 <?xml version='1.0' encoding='utf-8'?>
-<widget id="com.ekitabu.mobile" version="3.2.8" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
+<widget id="com.ekitabu.mobile" version="3.2.9" xmlns="http://www.w3.org/ns/widgets" xmlns:cdv="http://cordova.apache.org/ns/1.0">
     <name>eKitabu</name>
     <description>EPUB reader for Android</description>
     <author email="support@ekitabu.com" href="http://www.ekitabu.com">eKitabu, LLC</author>
@@ -21,12 +21,23 @@
         <allow-intent href="itms:*"/>
         <allow-intent href="itms-apps:*"/>
     <icon src="www/icons/large.png"/><icon src="www/icons/small.png" width="16"/><icon src="www/icons/medium.png" width="48"/><icon src="www/icons/large.png" width="128"/></platform>
+
+    <!-- Splash screens -->
+    <platform name="android">
+      <splash src="res/screen/android/splash-land-960x720.png" density="land-xhdpi"/>
+      <splash src="res/screen/android/splash-port-720x1280.png" density="port-xhdpi"/>
+
+      <preference name="ShowSplashScreenSpinner" value="false"/>
+      <preference name="SplashMaintainAspectRatio" value="true"/>
+    </platform>
+
     <preference name="android-minSdkVersion" value="14"/>
     <preference name="xwalkCommandLine" value="--disable-pull-to-refresh-effect"/>
     <preference name="xwalkMode" value="embedded"/>
     <preference name="xwalkMultipleApk" value="true"/>
     <plugin name="link" spec="../../link-cordova-plugin"/>
     <plugin name="cordova-plugin-device" spec="1.1.7"/>
-    <plugin name="cordova-plugin-android-permissions" spec="~1.0.0"/>    
+    <plugin name="cordova-plugin-android-permissions" spec="~1.0.0"/>
     <plugin name="cordova-plugin-appminimize" spec="~1.0"/>
+    <plugin name="cordova-plugin-splashscreen" spec="~5.0.2"/>
 <access origin="https://www.google-analytics.com/*"/></widget>

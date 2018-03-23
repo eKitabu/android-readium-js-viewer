@@ -191,6 +191,11 @@ PouchDB){
     var loadFilterCategoriesDialog = function() {
         //load the categories template as a string
         var levels = self.grades;
+
+        if (_.isEmpty(levels)) {
+            return;
+        }
+
         bodyStr = FilterCategoriesDialogBody({string: Strings, levels: levels });
         showDialog("filterCategories");
         $('.filterCategories-dialog .modal-body').html(bodyStr);
