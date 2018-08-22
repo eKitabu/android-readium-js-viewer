@@ -1,5 +1,7 @@
 _Note: Please don't use the zip download feature on this repo as this repo uses submodules and this is not supported at present by github and will result in an incomplete copy of the repo._
 
+# [![Build Status](https://travis-ci.com/eKitabu/android-readium-js-viewer.svg?branch=travis)](https://travis-ci.com/eKitabu/android-readium-js-viewer)
+
 # readium-js-viewer
 
 **EPUB reader written in HTML, CSS and Javascript.**
