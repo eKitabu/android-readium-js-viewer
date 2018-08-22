@@ -11,17 +11,7 @@ before_install:
 #
 # READIUM JS VIEWER
 #
-#- git fetch --all
-#- for remote in `git branch -r | grep -v \> | grep -v master`; do git branch --track ${remote#origin/} $remote; done
-- git branch -avv
-- git remote -v
-- git show-ref --heads
-- git show-ref --head --hash head
-- git branch -a --contains $(git rev-parse HEAD)
-- git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1
-- git checkout `git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1 | head -n1`
-- git branch -avv
-#
+
 # READIUM JS
 #
 - cd readium-js
