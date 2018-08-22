@@ -33,11 +33,8 @@ before_script:
 script:
 - cd readium-js/readium-shared-js/readium-cfi-js
 - npm run build
-- npm run test:travis
 - cd ../../..
 - pwd
-- git status
-- npm run pretest:travis
 - git status
 - cd readium-js
 - git status
