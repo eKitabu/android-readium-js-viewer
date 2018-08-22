@@ -17,11 +17,7 @@
     "epub",
     "epub3"
   ],
-  "author": {
-    "name": "Readium (Daniel Weck)",
-    "email": "daniel.weck@gmail.com",
-    "url": "http://github.com/readium"
-  },
+  "author": "Readium <daniel.weck@gmail.com> (Daniel Weck)",
   "license": "BSD-3-Clause",
   "licenses": [
     {
@@ -173,5 +169,9 @@
     "deploy:cloudReader:copy:sourcemap": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/cloud-reader_sourcemap/ dist/cloud-reader/scripts/ && ( node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/zip_sourcemap/ dist/cloud-reader/scripts/zip/ || echo \"=== SUCCESS [ignore previous error]: no sourcemaps were generated for zip web-worker, deflate, inflate (no uglification).\" )",
     "deploy:cloudReaderLite:copy:sourcemap": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/cloud-reader-lite_sourcemap/ dist/cloud-reader-lite/scripts/ && ( node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/zip_sourcemap/ dist/cloud-reader-lite/scripts/zip/ || echo \"=== SUCCESS [ignore previous error]: no sourcemaps were generated for zip web-worker, deflate, inflate (no uglification).\" )",
     "deploy:chromeApp:copy:sourcemap": "node ./readium-js/readium-shared-js/readium-cfi-js/node_modules/ncp/bin/ncp dist/chrome-app_sourcemap/ dist/chrome-app/scripts/"
+  },
+  "main": "index.js",
+  "directories": {
+    "test": "tests"
   }
 }
