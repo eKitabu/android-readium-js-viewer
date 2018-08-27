@@ -1,111 +1,40 @@
-esudo: false
-branches:
-  only:
-  - develop
-language: node_js
-node_js:
-- '8'
-before_install:
-- git submodule update --init --recursive
-#
-# READIUM JS VIEWER
-#
-#- git fetch --all
-#- for remote in `git branch -r | grep -v \> | grep -v master`; do git branch --track ${remote#origin/} $remote; done
-- git branch -avv
-- git remote -v
-- git show-ref --heads
-- git show-ref --head --hash head
-- git branch -a --contains $(git rev-parse HEAD)
-- git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1
-- git checkout `git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1 | head -n1`
-- git branch -avv
-#
-# READIUM JS
-#
-- cd readium-js
-#
-#- git fetch --all
-- for remote in `git branch -r | grep -v \> | grep -v master`; do git branch --track ${remote#origin/} $remote; done
-- git branch -avv
-- git remote -v
-- git show-ref --heads
-- git show-ref --head --hash head
-- git branch -a --contains $(git rev-parse HEAD)
-- git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1
-- git checkout `git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1 | head -n1`
-- git branch -avv
-#
-# READIUM SHARED JS
-#
-- cd readium-shared-js
-#
-#- git fetch --all
-- for remote in `git branch -r | grep -v \> | grep -v master`; do git branch --track ${remote#origin/} $remote; done
-- git branch -avv
-- git remote -v
-- git show-ref --heads
-- git show-ref --head --hash head
-- git branch -a --contains $(git rev-parse HEAD)
-- git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1
-- git checkout `git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1 | head -n1`
-- git branch -avv
-- echo "plugins:['hypothesis']" > plugins/plugins.cson
-- cat plugins/plugins.cson
-#
-# READIUM CFI JS
-#
-- cd readium-cfi-js
-#
-#- git fetch --all
-- for remote in `git branch -r | grep -v \> | grep -v master`; do git branch --track ${remote#origin/} $remote; done
-- git branch -avv
-- git remote -v
-- git show-ref --heads
-- git show-ref --head --hash head
-- git branch -a --contains $(git rev-parse HEAD)
-- git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1
-- git checkout `git for-each-ref --format="%(refname:short) %(objectname)" 'refs/heads/' | grep $(git rev-parse HEAD) | cut -d " " -f 1 | head -n1`
-- git branch -avv
-#
-- cd ../../../
-install:
-- npm run prepare:all
-before_script:
-- pwd
-script:
-- cd readium-js/readium-shared-js/readium-cfi-js
-- npm run build
-- npm run test:travis
-- cd ../../..
-- pwd
-- git status
-- npm run pretest:travis
-- git status
-- cd readium-js
-- git status
-- cd readium-shared-js
-- git status
-- cd readium-cfi-js
-- git status
-- cd ../../../
-- cat build-output/version.json
-after_success:
--'npm run coveralls'
-- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ ${MODE} = "firefox" ] && npm install surge && echo "epub_content" > ./dist/cloud-reader/.surgeignore && surge --project ./dist/cloud-reader --domain readium.surge.sh'
-- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ ${MODE} = "firefox" ] && npm install firebase-tools && firebase deploy --non-interactive --token "$FIREBASE_TOKEN" --project "project-1351855251145549090"'
-- '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ ${MODE} = "chromeApp" ] && node build-config/deployCrx.js'
-after_failure: cat ./sauce_connect.log
-env:
-  global:
-  - SAUCE_USERNAME=readium
-  - SAUCE_ACCESS_KEY=a36ebc10-e514-4da6-924c-307aec513550
-  - USE_SAUCE=true
-  - secure: nwpNZad60c5GglOpnesV6sggzsbCIbLg1ORHB2s347g3tIu3a7evbbToaDD/tsnnZsLHdR71hypCECRFMDORcmkx144lWRlquiGtvIcNb86jAR//QQtzLekFly9UAN6ublG0g5lvdjvBwxlPF1Jig+OMNR95BsnUxbmA8b5guIM=
-  matrix:
-  - MODE=chromeApp
-  - MODE=firefox
-addons:
-  sauce_connect:
-    username: readium
-    access_key: a36ebc10-e514-4da6-924c-307aec513550
+ "os": "linux",
+  "env": "MODE=firefox",
+  "dist": "trusty",
+  "esudo": false,
+  "group": "stable",
+  "script": [
+    "cd readium-js/readium-shared-js/readium-cfi-js",
+    "cd ../../..",
+    "pwd",
+    "git status",
+    "cd readium-js",
+    "git status",
+    "cd readium-shared-js",
+    "git status",
+    "cd readium-cfi-js",
+    "git status"
+  ],
+  "install": [
+    "npm run prepare:all"
+  ],
+  "node_js": "8",
+  "language": "node_js",
+  "global_env": "SAUCE_USERNAME=readium SAUCE_ACCESS_KEY=a36ebc10-e514-4da6-924c-307aec513550 USE_SAUCE=true nwpNZad60c5GglOpnesV6sggzsbCIbLg1ORHB2s347g3tIu3a7evbbToaDD/tsnnZsLHdR71hypCECRFMDORcmkx144lWRlquiGtvIcNb86jAR//QQtzLekFly9UAN6ublG0g5lvdjvBwxlPF1Jig+OMNR95BsnUxbmA8b5guIM=[secure]",
+  "after_failure": "cat ./sauce_connect.log",
+  "after_success": [
+    "[ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ] && [ ${MODE} = \"firefox\" ] && npm install surge && echo \"epub_content\" > ./dist/cloud-reader/.surgeignore && surge --project ./dist/cloud-reader --domain readium.surge.sh",
+    "[ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ] && [ ${MODE} = \"firefox\" ] && npm install firebase-tools && firebase deploy --non-interactive --token \"$FIREBASE_TOKEN\" --project \"project-1351855251145549090\"",
+    "[ \"${TRAVIS_PULL_REQUEST}\" = \"false\" ] && [ ${MODE} = \"chromeApp\" ] && node build-config/deployCrx.js"
+  ],
+  "before_script": [
+    "pwd"
+  ],
+  "before_install": [
+    "git submodule update --init --recursive",
+    "cd readium-js",
+    "cd readium-shared-js",
+    "cd readium-cfi-js",
+    "cd ../../../"
+  ]
+}
