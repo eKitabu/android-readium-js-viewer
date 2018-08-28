@@ -48,7 +48,6 @@
   "dependencies": {
     "concurrently": "latest",
     "http-server": "github:danielweck/http-server",
-    "npm-run-all": "latest",
     "opener": "latest",
     "papaparse": "^4.3.6",
     "pouchdb": "^6.3.4"
@@ -76,6 +75,7 @@
     "keymaster": "github:danielweck/keymaster",
     "mathjax-single-file": "github:danielweck/MathJax-single-file",
     "mocha": "^5.2.0",
+    "npm-run-all": "^4.1.3",
     "nyc": "^12.0.2",
     "phantomjs-prebuilt": "latest",
     "remotestoragejs": "latest",
