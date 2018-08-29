@@ -46,7 +46,7 @@
     "README.md"
   ],
   "dependencies": {
-    "concurrently": "latest",
+    "concurrently": "^4.0.1",
     "http-server": "github:danielweck/http-server",
     "opener": "latest",
     "papaparse": "^4.3.6",
