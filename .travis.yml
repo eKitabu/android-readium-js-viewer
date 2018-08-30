@@ -70,7 +70,6 @@ script:
 - cd readium-shared-js
 - git status
 - cd ../../
-- cat build-output/version.json
 after_success:
 - npm run coverage
 - '[ "${TRAVIS_PULL_REQUEST}" = "false" ] && [ ${MODE} = "firefox" ] && npm install surge && echo "epub_content" > ./dist/cloud-reader/.surgeignore && surge --project ./dist/cloud-reader --domain readium.surge.sh'
