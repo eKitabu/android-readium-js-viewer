@@ -59,6 +59,7 @@
     "chai": "3.x",
     "chai-as-promised": "^7.1.1",
     "clean-css-cli": "^4.1.10",
+    "coveralls": "^3.0.2",
     "crx": "^3.2.1",
     "decompress-zip": "^0.3.1",
     "gift": "^0.10.1",
@@ -73,6 +74,7 @@
     "keymaster": "github:danielweck/keymaster#master",
     "mathjax-single-file": "github:danielweck/MathJax-single-file#master",
     "mocha": "^5.2.0",
+    "nyc": "^13.0.1",
     "phantomjs-prebuilt": "^2.1.16",
     "remotestoragejs": "^1.0.3",
     "requirejs-hogan-plugin": "^0.3.1",
@@ -83,6 +85,8 @@
     "xml2js": "^0.4.19"
   },
   "scripts": {
+    "test": "nyc mocha",
+     "coverage": "nyc report --reporter=text-lcov | coveralls",
     "cson2json": "node ./readium-js/readium-shared-js/readium-build-tools/concat.js \"package/*.cson\" package.cson && node ./readium-js/readium-shared-js/node_modules/cson/bin/cson2json package.cson > package.json && node ./readium-js/readium-shared-js/node_modules/rimraf/bin.js package.cson && node readium-js/readium-shared-js/readium-build-tools/optimizePackageJsonScripts.js",
     "prepare:all": "npm run prepare:submodule && npm run prepare:local",
     "prepare:local": "(npm outdated || echo outdated) && (npm ci || npm install) && npm run prepare:local:common",
